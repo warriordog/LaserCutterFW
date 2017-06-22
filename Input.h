@@ -26,6 +26,9 @@ namespace input {
 
     void setup();
 
+    void sendMessage(const __FlashStringHelper* message);
+    void sendInt(int val);
+
     bool lineReady();
     void poll();
     String* takeLine();

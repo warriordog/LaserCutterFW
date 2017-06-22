@@ -83,61 +83,6 @@ namespace parser {
         }
     }
     
-    /*
-    void Parser::parseLine(String line) {
-        char c = line[0];
-        int idx = skipSpace(0, line);
-        
-        char letter = -1;
-        long iNum = 0;
-        float fNum = 0;
-        
-        while (idx < lineLength) {
-            // end at null byte
-            if (c == 0) {
-                //TODO send to gcode::
-                break;
-            }
-            
-            // skip comments
-            if (c == ';') {
-                break;
-            }
-            
-            // convert to upper case
-            if (c >= 'a' && c <= 'z') {
-                c -= ('a' - 'A');
-            }
-            
-            // just starting a command
-            if (letter == -1) {
-                // make sure it starts with a letter
-                if (c >= 'A' && c <= 'Z') {
-                    letter = c;
-                    int start = idx + 1;
-                    int end = skipSpace(start, line);
-                    
-                    // make sure there are numbers
-                    if (start < lineLength - 1 && end - start > 0) {
-                        iNum = toInt(
-                    }
-                } else {
-                    input::sendError(error::Error.BAD_GCODE);
-                    break;
-                }
-            }
-        }
-        for (int idx = 0; idx < lineLength; idx++) {
-            // end at null byte
-            if (c == 0) {
-                break;
-            }
-            
-            
-        }
-    }
-    
-    */
     bool hasWork() {
         return !lineQueue.isEmpty() || gcode::isWorking();
     }

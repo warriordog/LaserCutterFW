@@ -3,6 +3,7 @@
 #include "Laser.h"
 #include "Parser.h"
 #include "LaserFW.h"
+#include "Input.h"
 
 namespace gcode {
     // 0 is idle, 1 is code-default, everything else is code-specific
@@ -138,6 +139,14 @@ namespace gcode {
                         case 5:
                             laser::laserPowerOff();
                             currState = 0;
+                            break;
+                        //M114 get position
+                        case 114:
+                            input::sendMessage(F("X:"));
+                            input::sendInt(plotter::getXLocation());
+                            input::sendMessage(F(" Y:"));
+                            input::sendInt(plotter::getYLocation());
+                            input::sendMessage(F("\n"));
                             break;
                         // invalid
                         default:

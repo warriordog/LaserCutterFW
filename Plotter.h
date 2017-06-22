@@ -20,6 +20,9 @@ namespace plotter {
     bool isMovingY();
     bool isMoving();
     
+    long getXLocation();
+    long getYLocation();
+    
     unsigned long getTimeArrived();
     
     void updateMovement();

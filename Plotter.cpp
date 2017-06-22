@@ -206,4 +206,13 @@ namespace plotter {
         
         timeArrived = millis();
     }
+    
+    
+    long getXLocation() {
+        return xLocation;
+    }
+    
+    long getYLocation() {
+        return yLocation;
+    }
 }

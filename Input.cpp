@@ -17,6 +17,15 @@ namespace input {
         Serial.println(F("LaserFW 0.0.1"));
     }
 
+
+    void sendMessage(const __FlashStringHelper* message) {
+        Serial.print(message);
+    }
+    
+    void sendInt(int val) {
+        Serial.print(val);
+    }
+
     bool lineReady() {
         return bufferState == READY;
     }
@@ -26,6 +35,7 @@ namespace input {
             if (updateImmediateHandler(Serial.peek())) {
                 //ignore byte handled by immediate handler
                 Serial.read();
+                sendMessage(F("OK\n"));
             } else if (bufferState != READY) {
                 int ch = Serial.read();
                 
@@ -38,6 +48,7 @@ namespace input {
                     
                     nextBufferIdx = 0;
                     bufferState = READY;
+                sendMessage(F("OK\n"));
                 // don't read into full buffer, just ignore the byte and wait for newline
                 } else if (bufferState != OVERFLOW) {
                     buffer[nextBufferIdx] = ch;

@@ -186,7 +186,7 @@ namespace gcode {
                             break;
                         //M114 get position
                         case 114:
-                            input::sendMessage(F("X:"));
+                            input::sendMessage(F("M114 X:"));
                             input::sendInt(plotter::getXLocation());
                             input::sendMessage(F(" Y:"));
                             input::sendInt(plotter::getYLocation());

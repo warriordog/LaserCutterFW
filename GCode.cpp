@@ -132,6 +132,12 @@ namespace gcode {
                             break;
                         //M03 spindle on
                         case 3:
+                            Field* fS = findField('S');
+                            
+                            if (fS != nullptr) {
+                                laser::setLaserPower(fS->iNum);
+                            }
+                        
                             laser::laserPowerOn();
                             currState = 0;
                             break;

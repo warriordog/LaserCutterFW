@@ -9,14 +9,18 @@ namespace parser {
     QueueArray<String*> lineQueue;
       
     int skipSpace(int start, String* line) {
-        while (start < line->length() && line[start] == ' ') {
+        while (start < line->length() && line->charAt(start) == ' ') {
             start++;
         }
         return start;
     }
     
+    // stops at end
     int skipToSpace(int start, String* line) {
-        return line->indexOf(' ', start);
+        while (start < line->length() && line->charAt(start) != ' ') {
+            start++;
+        }
+        return start;
     }
     
     void parseLine(String* line) {
@@ -25,10 +29,16 @@ namespace parser {
         
         int idx = 0;
         while (idx < line->length()) {
-            // skip spaces
-            idx = skipSpace(idx, line);
+            //Serial.print(F("Loop: "));
+            //Serial.println(line->charAt(idx));
         
             char c = line->charAt(idx);
+            
+            // skip spaces
+            if (c == ' ') {
+                idx++;
+                continue;
+            }
         
             // stop when we hit a comment
             if (c == ';') {
@@ -40,8 +50,9 @@ namespace parser {
                 c -= ('a' - 'A');
             }
             
-            // skip missing letters
-            if (c <= 'A' && c >= 'Z') {
+            // skip non-letters
+            if (c < 'A' || c > 'Z') {
+                idx = skipToSpace(idx, line);
                 continue;
             }
             
@@ -55,8 +66,17 @@ namespace parser {
             int start = idx + 1;
             int end = skipToSpace(start, line);
             
+            /*
+            Serial.print(F("Checking "));
+            Serial.print(c);
+            Serial.print('/');
+            Serial.print(start);
+            Serial.print('/');
+            Serial.println(end);
+            */
+            
             // make sure the numbers are in bounds
-            if (start < line->length() - 1 && end - start > 0) {
+            if (start < line->length()) {
                 long iNum = line->substring(start, end).toInt();
                 float fNum = line->substring(start, end).toFloat();
                 gcode::Field* field = new gcode::Field;
@@ -87,7 +107,8 @@ namespace parser {
         return !lineQueue.isEmpty() || gcode::isWorking();
     }
     
-    void startNextMovement() {
+    void startNextCode() {
+        //Serial.println(F("Starting movement"));
         if (gcode::isWorking()) {
             gcode::update();
         } else if (!lineQueue.isEmpty()) {
@@ -109,7 +130,10 @@ namespace parser {
     
     void addLine(String* string) {
         if (string != nullptr) {
+        //Serial.println(F("Line added"));
             lineQueue.push(string);
+        } else {
+        //Serial.println(F("Line null"));
         }
     }
 }

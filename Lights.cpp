@@ -40,7 +40,8 @@ namespace lights {
     void updateBlink() {
         if (pwrBlinking) {
             if (millis() - pwrBlinkStart > pwrBlinkDuration) {
-                digitalWrite2(PIN_LED_POWER, LOW);
+                // make sure LED pin ends in 'ON' state
+                digitalWrite2(PIN_LED_POWER, HIGH);
                 pwrBlinking = false;
             } else {
                 // turn off or by by interval

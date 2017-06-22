@@ -26,13 +26,25 @@ namespace gcode {
     }
     
     void FieldList::add(Field* field) {
-        for (FieldNode* node = head; node != nullptr; node = node->next) {
-            if (node->next == nullptr) {
-                node->next = new FieldNode;
-                node->next->field = field;
-                
-                // if we don't break then the field will be added infinitely
-                break;
+    /*
+        Serial.print(F("Adding: '"));
+        Serial.print(field->letter);
+        Serial.print(field->iNum);
+        Serial.println('\'');
+      
+      */
+        if (head == nullptr) {
+            head = new FieldNode;
+            head->field = field;
+        } else {
+            for (FieldNode* node = head; node != nullptr; node = node->next) {
+                if (node->next == nullptr) {
+                    node->next = new FieldNode;
+                    node->next->field = field;
+                    
+                    // if we don't break then the field will be added infinitely
+                    break;
+                }
             }
         }
     }
@@ -47,7 +59,26 @@ namespace gcode {
     
         currCommand = command;
         currArgs = args;
-        currState = 1;
+        
+        if (currCommand != nullptr) {
+            currState = 1;
+            
+            /*
+            input::sendMessage(F("Executing: '"));
+            input::sendChar(currCommand->letter);
+            input::sendInt(currCommand->iNum);
+            
+            if (currArgs != nullptr) {
+                for (FieldNode* node = currArgs->getHead(); node != nullptr; node = node->next) {
+                    input::sendMessage(F(" "));
+                    input::sendChar(node->field->letter);
+                    input::sendInt(node->field->iNum);
+                }
+            }
+            
+            input::sendMessage(F("'\n"));
+            */
+        }
     }
     
     bool isWorking() {
@@ -133,6 +164,7 @@ namespace gcode {
                         // M0 unconditional stop
                         case 0:
                             shutdownMachine();
+                            currState = 0;
                             break;
                         //M03/M04 spindle on
                         case 3:
@@ -159,6 +191,7 @@ namespace gcode {
                             input::sendMessage(F(" Y:"));
                             input::sendInt(plotter::getYLocation());
                             input::sendMessage(F("\n"));
+                            currState = 0;
                             break;
                         // invalid
                         default:

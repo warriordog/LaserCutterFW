@@ -7,6 +7,19 @@ namespace scheduler {
     MoveState moveState = IDLE;
 
     void tick() {
+        //Serial.println(F("SchedulerTick"));
+        // update movement
+        if (plotter::isMoving()) {
+        
+            //Serial.println(F("Plotter moving"));
+            plotter::updateMovement();
+        // start next task
+        } else if (parser::hasWork()) {
+            //Serial.println(F("Parser working"));
+            parser::startNextCode();
+        }
+    
+    /*
         // update movement and exeuction
         switch (moveState) {
             case IDLE:
@@ -24,7 +37,7 @@ namespace scheduler {
                     }
                 // if we have finished the current movement but there is more to do
                 } else if (!plotter::isMoving()) {
-                    parser::startNextMovement();
+                    parser::startNextCode();
                 }
                 break;
             case MOVING:
@@ -39,12 +52,12 @@ namespace scheduler {
                 moveState = IDLE;
                 break;
         }
+        */
         
         // refill parser queue
         if (parser::hasQueueSpace()) {
             if (input::lineReady()) {
                 parser::addLine(input::takeLine());
-                //input.putLine(parser::readyLine(), parser::getLineLength());
             }
         }
         
@@ -52,44 +65,5 @@ namespace scheduler {
         if (!input::lineReady()) {
             input::poll();
         }
-        //if (!input::lineReady() && input::isReading()) {
-        //    input::pollSerial();
-        //}
-    
-        /*
-        switch (currentState) {
-            case IDLE:
-                input::pollInput();
-                
-                if (input::isReading()) {
-                    currentState = READING;
-                }
-                break;
-            case MOVING:
-                plotter::updateMovement();
-                
-                // check if we finish 
-                if (!plotter::isMoving()) {
-                
-                }
-                break;
-            case MOVING_READING:
-            
-                break;
-            case MOVING_PARSING:
-            
-                break;
-            case MOVING_READING_PARSING
-            case READING:
-            
-                break;
-            case PARSING:
-            
-                break;
-            default:
-            
-                break;
-        }
-                */
     }
 }

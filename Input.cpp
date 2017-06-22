@@ -25,6 +25,10 @@ namespace input {
     void sendInt(int val) {
         Serial.print(val);
     }
+    
+    void sendChar(char chr) {
+        Serial.print(chr);
+    }
 
     bool lineReady() {
         return bufferState == READY;
@@ -35,7 +39,6 @@ namespace input {
             if (updateImmediateHandler(Serial.peek())) {
                 //ignore byte handled by immediate handler
                 Serial.read();
-                sendMessage(F("OK\n"));
             } else if (bufferState != READY) {
                 int ch = Serial.read();
                 
@@ -48,7 +51,14 @@ namespace input {
                     
                     nextBufferIdx = 0;
                     bufferState = READY;
-                sendMessage(F("OK\n"));
+                    
+                    /*
+                    Serial.print(F("Ready: '"));
+                    Serial.print(buffer);
+                    Serial.println('\'');
+                    */
+                    
+                    sendMessage(F("OK\n"));
                 // don't read into full buffer, just ignore the byte and wait for newline
                 } else if (bufferState != OVERFLOW) {
                     buffer[nextBufferIdx] = ch;
@@ -66,8 +76,29 @@ namespace input {
     
     String* takeLine() {
         String* str = new String(buffer);
+        //Serial.print(F("Taking: "));
+        //Serial.println(str->c_str());
         nextBufferIdx = 0;
         bufferState = EMPTY;
+        return str;
+    }
+    
+    void immWriteBack(char ch1) {
+        if (nextBufferIdx < MAX_GCODE_LENGTH) {
+            buffer[nextBufferIdx] = ch1;
+            nextBufferIdx++;
+        }
+    }
+    
+    void immWriteBack(char ch1, char ch2) {
+        immWriteBack(ch1);
+        immWriteBack(ch2);
+    }
+    
+    void immWriteBack(char ch1, char ch2, char ch3) {
+        immWriteBack(ch1);
+        immWriteBack(ch2);
+        immWriteBack(ch3);
     }
     
     bool updateImmediateHandler(int ch) {
@@ -83,6 +114,7 @@ namespace input {
                     immState = M1;
                     return true;
                 } else {
+                    immWriteBack('M');
                     immState = NONE;
                 }
                 break;
@@ -91,14 +123,17 @@ namespace input {
                     immState = M11;
                     return true;
                 } else {
+                    immWriteBack('M', '1');
                     immState = NONE;
                 }
                 break;
             case M11:
                 if (ch == '2') {
+                    sendMessage(F("OK\n"));
                     shutdownMachine();
                     return true;
                 } else {
+                    immWriteBack('M', '1', '1');
                     immState = NONE;
                 }
                 break;

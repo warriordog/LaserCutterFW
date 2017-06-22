@@ -3,6 +3,8 @@
 #include <Arduino.h>
 #include "Constants.h"
 
+// TODO rewrite completely using um units, no floats, and RPM control
+
 namespace plotter {
     /*
         Settings

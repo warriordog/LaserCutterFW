@@ -5,7 +5,7 @@
 
 namespace parser {
     bool hasWork();
-    void startNextMovement();
+    void startNextCode();
     bool hasQueueSpace();
     void addLine(String* string); 
     void clearBuffer();

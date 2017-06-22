@@ -6,14 +6,16 @@
 #include "Scheduler.h"
 #include "Safety.h"
 #include "Input.h"
+#include "Lights.h"
 
 bool machineRunning = true;
 
 void laserSetup() {
-    safety::setup();
+    lights::setup();
     input::setup();
     plotter::setup();
     laser::setup();
+    safety::setup(); // start up last because of WDT
 }
 
 void laserLoop() {
@@ -26,9 +28,10 @@ void laserLoop() {
 
 void shutdownMachine() {
     machineRunning = false;
-    safety::shutdown();
+    safety::shutdown(); //shutdown first because of WDT
     plotter::cancelMovement();
     laser::laserPowerOff();
     parser::clearBuffer();
+    lights::shutdown();
 }
 

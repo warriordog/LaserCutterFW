@@ -33,4 +33,14 @@
 // Maximum time in ms that laser can stay in one place
 #define LASER_DWELL_LIMIT   4000
 
+// LED blink times
+    // Safety fault blink
+#define LED_SAFETY_DURATION 10000   // 10 seconds
+#define LED_SAFETY_INTERVAL 500     // every half second
+    // gcode error blink
+#define LED_ERROR_DURATION  5000    // 5 seconds
+#define LED_ERROR_INTERVAL  1000    // every second
+    // gcode executed blink
+#define LED_ACT_DURATION    100     // 1/10 of a second
+
 #endif //CONFIG_H

@@ -4,6 +4,7 @@
 #include "Parser.h"
 #include "LaserFW.h"
 #include "Input.h"
+#include "Lights.h"
 
 namespace gcode {
     // 0 is idle, 1 is code-default, everything else is code-specific
@@ -66,6 +67,9 @@ namespace gcode {
     
     void update() {
         if (currState != 0) {
+            // blink activity
+            lights::blinkActivity();    
+            
             switch (currCommand->letter) {
                 // G-codes
                 case 'G':

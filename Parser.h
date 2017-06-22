@@ -1,0 +1,14 @@
+#ifndef PARSER_H
+#define PARSER_H
+#include <QueueArray.h>
+#include <Arduino.h>
+
+namespace parser {
+    bool hasWork();
+    void startNextMovement();
+    bool hasQueueSpace();
+    void addLine(String* string); 
+    void clearBuffer();
+}
+
+#endif //PARSER_H

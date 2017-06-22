@@ -12,7 +12,7 @@
 #ifndef STEPPER_DRIVER_BASE_H
 #define STEPPER_DRIVER_BASE_H
 #include <Arduino.h>
-#include "BasicStepperDriver.h"
+//#include "BasicStepperDriver.h"
 #include "arduino2.h"
 
 // used internally by the library to mark unconnected pins

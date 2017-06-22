@@ -21,4 +21,13 @@
 #define DEF_X_FEED          1000
 #define DEF_Y_FEED          1000
 
+// number of gcode instructions to queue
+#define GCODE_QUEUE_SIZE    16
+
+// Serial baud rate
+#define SERIAL_BAUD         115200
+
+// Max length of a gcode instruction
+#define MAX_GCODE_LENGTH    64
+
 #endif //CONFIG_H

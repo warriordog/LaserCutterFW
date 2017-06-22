@@ -130,17 +130,19 @@ namespace gcode {
                         case 0:
                             shutdownMachine();
                             break;
-                        //M03 spindle on
+                        //M03/M04 spindle on
                         case 3:
+                        case 4: {
                             Field* fS = findField('S');
                             
                             if (fS != nullptr) {
-                                laser::setLaserPower(fS->iNum);
+                                laser::setLaserLevel(fS->iNum);
                             }
                         
                             laser::laserPowerOn();
                             currState = 0;
                             break;
+                        }
                         //M05 spindle off
                         case 5:
                             laser::laserPowerOff();

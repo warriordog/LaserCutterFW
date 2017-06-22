@@ -30,4 +30,7 @@
 // Max length of a gcode instruction
 #define MAX_GCODE_LENGTH    64
 
+// Maximum time in ms that laser can stay in one place
+#define LASER_DWELL_LIMIT   4000
+
 #endif //CONFIG_H

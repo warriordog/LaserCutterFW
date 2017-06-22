@@ -6,8 +6,10 @@ namespace laser {
 
     void laserPowerOff();
     void laserPowerOn();
+    bool isLaserOn();
     
     void setLaserLevel(int level);
+    int getLaserLevel();
 }
 
 #endif

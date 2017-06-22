@@ -1,14 +1,14 @@
-//#include "LaserFW.h"
-#include "LaserTest.h"
+#include "LaserFW.h"
+//#include "LaserTest.h"
 
 void setup() {
   //pass through to real code
-  //laserSetup();
-  testSetup();
+  laserSetup();
+  //testSetup();
 }
 
 void loop() {
   //pass through to real code
-  //laserLoop();
-  testLoop();
+  laserLoop();
+  //testLoop();
 }

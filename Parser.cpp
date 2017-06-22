@@ -93,6 +93,7 @@ namespace parser {
         } else if (!lineQueue.isEmpty()) {
             String* line = lineQueue.pop();
             parseLine(line);
+            delete line;  // no memory leaks
         }
     }
     
@@ -103,6 +104,12 @@ namespace parser {
     void clearBuffer() {
         while (!lineQueue.isEmpty()) {
             delete lineQueue.pop();
+        }
+    }
+    
+    void addLine(String* string) {
+        if (string != nullptr) {
+            lineQueue.push(string);
         }
     }
 }

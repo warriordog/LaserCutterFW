@@ -3,11 +3,7 @@
 #include "Stepper.h"
 
 namespace plotter {
-    bool hasXMotor();
-    bool hasYMotor();
-    
-    void setXMotor(stepper::Stepper* stepper);
-    void setYMotor(stepper::Stepper* stepper);
+    void setup();
     
     void setTargetX(int target);
     void setTargetY(int target);

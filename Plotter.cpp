@@ -1,6 +1,7 @@
 #include "Plotter.h"
 #include "Config.h"
 #include <Arduino.h>
+#include "Constants.h"
 
 namespace plotter {
     /*
@@ -60,11 +61,10 @@ namespace plotter {
         -----------------------------
     */
     
-    bool hasXMotor() {return xStepper != nullptr;}
-    bool hasYMotor() {return yStepper != nullptr;}
-    
-    void setXMotor(stepper::Stepper* stepper) {xStepper = stepper;}
-    void setYMotor(stepper::Stepper* stepper) {yStepper = stepper;}
+    void setup() {
+        xStepper = new stepper::Stepper(PIN_X_STEP, PIN_X_DIR, PIN_X_EN);
+        yStepper = new stepper::Stepper(PIN_Y_STEP, PIN_Y_DIR, PIN_Y_EN);
+    }
     
     void setTarget(int x, int y) {setTargetX(x); setTargetY(y);}
     
@@ -131,7 +131,7 @@ namespace plotter {
             }
             
             //update x axis movement
-            if (isMovingX() && hasXMotor()) {
+            if (isMovingX()) {
                 unsigned long curDistUM = abs(xLocation - xStart);
                 unsigned long curMMperMin = calcCurMMPerMin(curTimeMS, curDistUM);
                 
@@ -161,7 +161,7 @@ namespace plotter {
             }
             
             //update y axis movement
-            if (isMovingY() && hasYMotor()) {
+            if (isMovingY()) {
                 unsigned long curDistUM = abs(xLocation - xStart);
                 unsigned long curMMperMin = calcCurMMPerMin(curTimeMS, curDistUM);
                 

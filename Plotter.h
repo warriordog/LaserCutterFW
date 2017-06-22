@@ -1,25 +1,24 @@
 #ifndef PLOTTER_H
 #define PLOTTER_H
 #include "Stepper.h"
+#include "Units.h"
 
 namespace plotter {
     void setup();
     
-    void setTargetX(int target);
-    void setTargetY(int target);
-    void setTarget(int x, int y);
+    void setTargetX(dist_um target);
+    void setTargetY(dist_um target);
+    void setTarget(dist_um x, dist_um y);
     
-    void setXSpeed(int vel);
-    void setYSpeed(int vel);
+    void setXSpeed(mm_per_min vel);
+    void setYSpeed(mm_per_min vel);
     
-    bool isMovingX();
-    bool isMovingY();
     bool isMoving();
     
-    long getXLocation();
-    long getYLocation();
+    dist_um getXLocation();
+    dist_um getYLocation();
     
-    unsigned long getTimeArrived();
+    time_ms getTimeArrived();
     
     void updateMovement();
     

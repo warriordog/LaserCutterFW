@@ -25,4 +25,10 @@
 #define PIN_LED_ACT         DP_INVALID  // blinks when executing gcode
 #define PIN_LED_LIFE        13          // pulses while board running (PWM)
 
+// Motors
+#define MOTOR_MICROSTEPS    16          // Microsteps per full step
+#define STEPS_PER_ROTATION  200L        // Full steps reuired per rotation
+#define DEGREES_PER_STEP    1.8         // 1.8 degrees / step
+#define STEPS_PER_DEGREE    0.55556     // 1.8 degrees / step
+
 #endif //CONSTANTS_H

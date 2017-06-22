@@ -30,6 +30,11 @@ namespace stepper {
             void moveToDeg(int degrees);
             void moveByDeg(int degrees);
             void moveByStep(int steps);
+            
+            void setRPM(int rpm);
+            
+            void tickDriver();
+            bool isMoving();
     };
 }
 

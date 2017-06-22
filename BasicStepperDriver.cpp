@@ -5,6 +5,7 @@
  * Copyright (C)2015 Laurentiu Badea
  *
  * Modified to use dio2 library for fast IO.  Normal arduino digitalWrite/etc are replaced with digitalWrite2/etc2.
+ * Modified to step asynchronously.
  *
  * This file may be redistributed under the terms of the MIT license.
  * A copy of this license has been included with this distribution in the file LICENSE.
@@ -95,7 +96,13 @@ void BasicStepperDriver::move(long steps){
      * We currently try to do a 50% duty cycle so it's easy to see.
      * Other option is step_high_min, pulse_duration-step_high_min.
      */
-    unsigned long pulse_duration = step_pulse/2;
+    pulse_duration = step_pulse/2;
+    steps_remaining = steps;
+    pulse_state = LOW;
+    last_step_time = micros() - pulse_duration;
+    
+    //wait for update tick instead of running here
+    /*
     while (steps--){
         digitalWrite2(step_pin, HIGH);
         unsigned long next_edge = micros() + pulse_duration;
@@ -103,6 +110,7 @@ void BasicStepperDriver::move(long steps){
         digitalWrite2(step_pin, LOW);
         microWaitUntil(next_edge + pulse_duration);
     }
+    */
 }
 
 /*
@@ -139,4 +147,20 @@ void BasicStepperDriver::disable(void){
 
 unsigned BasicStepperDriver::getMaxMicrostep(){
     return BasicStepperDriver::MAX_MICROSTEP;
+}
+
+// progresses the current movement
+void BasicStepperDriver::tickMovement() {
+    if (isMoving()) {
+        if (micros() - last_step_time > pulse_duration) {
+            pulse_state = !pulse_state;
+            digitalWrite2(step_pin, pulse_state);
+            steps_remaining--;
+        }
+    }
+}
+
+
+bool BasicStepperDriver::isMoving() {
+    return steps_remaining > 0;
 }

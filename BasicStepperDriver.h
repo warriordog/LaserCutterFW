@@ -5,6 +5,7 @@
  * Copyright (C)2015 Laurentiu Badea
  *
  * Modified to use dio2 library for fast IO.  Normal arduino digitalWrite/etc are replaced with digitalWrite2/etc2.
+ * Modified to step asynchronously.
  *
  * This file may be redistributed under the terms of the MIT license.
  * A copy of this license has been included with this distribution in the file LICENSE.
@@ -63,6 +64,14 @@ protected:
     // Get max microsteps supported by the device
     virtual unsigned getMaxMicrostep();
 
+    //steps remaining in this movement
+    int steps_remaining = 0;
+    //time of last movement
+    unsigned long last_step_time;
+    //duration of this movement
+    unsigned long pulse_duration;
+    //state of last pulse
+    bool pulse_state = LOW;
 private:
     // microstep range (1, 16, 32 etc)
     static const unsigned MAX_MICROSTEP = 128;
@@ -79,7 +88,7 @@ public:
      */
     unsigned setMicrostep(unsigned microsteps);
     /*
-     * Move the motor a given number of steps.
+     * Queue a movement by a given number of steps.
      * positive to move forward, negative to reverse
      */
     void move(long steps);
@@ -103,5 +112,8 @@ public:
      */
     void enable(void);
     void disable(void);
+    
+    void tickMovement();
+    bool isMoving();
 };
 #endif // STEPPER_DRIVER_BASE_H

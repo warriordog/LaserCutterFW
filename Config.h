@@ -14,18 +14,22 @@
 #define Y_AXIS_MAX          600     //just under 2 feet
 
 // steps per millimeter
-#define X_STEPS_PER_MM      300
-#define Y_STEPS_PER_MM      300
+#define X_STEPS_PER_MM      300L
+#define Y_STEPS_PER_MM      300L
 
 // default feed rates (mm / min)
-#define DEF_X_FEED          1000
-#define DEF_Y_FEED          1000
+#define DEF_X_FEED          1000L
+#define DEF_Y_FEED          1000L
 
-// number of gcode instructions to queue
-#define GCODE_QUEUE_SIZE    16
+// motor RPM
+#define MAX_RPM             200L
+#define DEFAULT_RPM         120L
 
 // Serial baud rate
 #define SERIAL_BAUD         115200
+
+// number of gcode instructions to queue
+#define GCODE_QUEUE_SIZE    16
 
 // Max length of a gcode instruction
 #define MAX_GCODE_LENGTH    64

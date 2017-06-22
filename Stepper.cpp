@@ -1,12 +1,14 @@
 #include "Stepper.h"
 #include "BasicStepperDriver.h"
+#include "Config.h"
+#include "Constants.h"
 
 namespace stepper {
     Stepper::Stepper (GPIO_pin_t stepPin, GPIO_pin_t directionPin, GPIO_pin_t enablePin)
         //create stepper with 1.8 degrees / step
-        : driver(200, directionPin, stepPin, enablePin) {
-        driver.setRPM(120); //120 RPM is safe
-        driver.setMicrostep(16); //jumpers set to 128, but controllers only support 16
+        : driver(STEPS_PER_ROTATION, directionPin, stepPin, enablePin) {
+        driver.setRPM(DEFAULT_RPM); //120 RPM is safe
+        driver.setMicrostep(MOTOR_MICROSTEPS); //jumpers set to 128, but controllers only support 16
     }
 
     void Stepper::moveToDeg (int degrees) {
@@ -33,5 +35,24 @@ namespace stepper {
                 driver.move(steps);
             }
         }
+    }
+    
+    
+    void Stepper::setRPM(int rpm) {
+        if (rpm < 0) {
+            rpm = 0;
+        }
+        if (rpm > MAX_RPM) {
+            rpm = MAX_RPM;
+        }
+        driver.setRPM(rpm);
+    }
+    
+    void Stepper::tickDriver() {
+        driver.tickMovement();
+    }
+    
+    bool Stepper::isMoving() {
+        return driver.isMoving();
     }
 }

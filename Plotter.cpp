@@ -2,47 +2,56 @@
 #include "Config.h"
 #include <Arduino.h>
 #include "Constants.h"
-
-// TODO rewrite completely using um units, no floats, and RPM control
+#include "Units.h"
 
 namespace plotter {
+    enum motor_state {
+        // not moving
+        IDLE,
+        
+        // movement requested, but command not send
+        WAITING,
+        
+        // one or more motors is moving
+        MOVING
+    };
+
     /*
         Settings
     */
     
     //movement speed of axis (mm / min)
-    int xSpeed = 0;
-    int ySpeed = 0;
+    mm_per_min xSpeed = 0;
+    mm_per_min ySpeed = 0;
 
     /*
         Current state
     */
 
     //current location of axis (um)
-    long xLocation = 0;
-    long yLocation = 0;
+    dist_um xLocation = 0;
+    dist_um yLocation = 0;
     
     //if an axis is currently moving
-    bool xMoving = false;
-    bool yMoving = false;
+    motor_state motorState = IDLE;
     
     /*
         Movement
     */
     
     //target of current movement (um)
-    long xTarget = 0;
-    long yTarget = 0;
+    dist_um xTarget = 0;
+    dist_um yTarget = 0;
     
     //location of axis at start of movement (um)
-    long xStart = 0;
-    long yStart = 0;
+    dist_um xStart = 0;
+    dist_um yStart = 0;
     
     //time that target location was reached
-    unsigned long timeArrived = 0;
+    time_ms timeArrived = 0;
     
     //time that the current movement started
-    unsigned long movementStartTime = 0;
+    time_ms movementStartTime = 0;
        
     /*
         Motors
@@ -50,12 +59,6 @@ namespace plotter {
     
     stepper::Stepper* xStepper = nullptr;
     stepper::Stepper* yStepper = nullptr;
-    
-    /*
-        Runtime-generated constants
-    */
-    const unsigned long X_UM_PER_STEP = (unsigned long)(1.0 / ((float)X_STEPS_PER_MM / 1000.0));
-    const unsigned long Y_UM_PER_STEP = (unsigned long)(1.0 / ((float)Y_STEPS_PER_MM / 1000.0));
     
     /*
         -----------------------------
@@ -68,18 +71,16 @@ namespace plotter {
         yStepper = new stepper::Stepper(PIN_Y_STEP, PIN_Y_DIR, PIN_Y_EN);
     }
     
-    void setTarget(int x, int y) {setTargetX(x); setTargetY(y);}
+    void setTarget(dist_um x, dist_um y) {setTargetX(x); setTargetY(y);}
     
-    void setXSpeed(int vel) {xSpeed = vel;}
-    void setYSpeed(int vel) {ySpeed = vel;}
+    void setXSpeed(mm_per_min vel) {xSpeed = vel;}
+    void setYSpeed(mm_per_min vel) {ySpeed = vel;}
     
-    bool isMovingX() {return xMoving;}
-    bool isMovingY() {return yMoving;}
-    bool isMoving() {return isMovingX() || isMovingY();}
+    bool isMoving() {return motorState == MOVING;}
     
-    unsigned long getTimeArrived() {return timeArrived;}
+    time_ms getTimeArrived() {return timeArrived;}
 
-    void setTargetX(int target) {
+    void setTargetX(dist_um target) {
         if (target < X_AXIS_MIN) {
             target = X_AXIS_MIN;
         }
@@ -88,12 +89,12 @@ namespace plotter {
         }
         if (target != xLocation) {
             xTarget = target;
-            xMoving = true;
+            motorState = WAITING;
             movementStartTime = millis();
         }
     }
     
-    void setTargetY(int target) {
+    void setTargetY(dist_um target) {
         if (target < Y_AXIS_MIN) {
             target = Y_AXIS_MIN;
         }
@@ -102,106 +103,91 @@ namespace plotter {
         }
         if (target != yLocation) {
             yTarget = target;
-            yMoving = true;
+            motorState = WAITING;
             movementStartTime = millis();
         }
     }
 
-    unsigned long calcCurMMPerMin(unsigned long curTimeMS, unsigned long curDistUM) {
-        float curDistMM = (float)curDistUM / 1000.0;
-        float curMMperMS = curDistMM / (float)curTimeMS;
-        unsigned long curMMperSec = (unsigned int)(curMMperMS * 1000.0);
-        unsigned long curMMperMin = curMMperSec * 60;
-        return curMMperMin;
+    /*
+      Plans and starts a motor movement
+    */
+    void startMovement() {
+        // in case neither motor starts moving for some reason.
+        motorState = IDLE;
+    
+        dist_um xDist = abs(xTarget - xLocation);
+        dist_um yDist = abs(yTarget - yLocation);
+        
+        if (xDist != 0) {
+            step_step steps = calcStepsForUm(xDist);
+            if (xTarget < xLocation) {
+                steps *= -1;
+            }
+            
+            step_rpm rpm = calcRPM(xDist, xSpeed);
+            if (rpm > MAX_RPM) {
+                rpm = MAX_RPM;
+            }
+            xStepper->setRPM(rpm);
+            
+            xStepper->moveByStep(steps);
+            motorState = MOVING;
+        }
+        
+        if (yDist != 0) {
+            step_step steps = calcStepsForUm(yDist);
+            if (yTarget < yLocation) {
+                steps *= -1;
+            }
+            
+            step_rpm rpm = calcRPM(xDist, ySpeed);
+            if (rpm > MAX_RPM) {
+                rpm = MAX_RPM;
+            }
+            yStepper->setRPM(rpm);
+            
+            yStepper->moveByStep(steps);
+            motorState = MOVING;
+        }
     }
 
     /*
       Progresses the current movement.
-      
-      Decides whether to tick a motor during this cycle by calculating the average feed rate of the movement so far.
-      
-      Possible optimization: change units of xVelocity and yVelocity to be a float MM/MS
-      Possible alternative: always tick but adjust RPM of motor
     */
     void updateMovement() {
-        //skip this whole giant fucntion if we are not moving
-        if (isMoving()) {
-            // calculate duration of this movement (so far)
-            unsigned long curTimeMS = millis() - movementStartTime;
-            if (curTimeMS == 0) {
-                curTimeMS = 1;
-            }
-            
-            //update x axis movement
-            if (isMovingX()) {
-                unsigned long curDistUM = abs(xLocation - xStart);
-                unsigned long curMMperMin = calcCurMMPerMin(curTimeMS, curDistUM);
-                
-                if (curMMperMin <= xSpeed) {
-                    long distanceUM = X_UM_PER_STEP;
-                    
-                    //moving forward
-                    if (xTarget > xLocation) {
-                        xStepper->moveByStep(1);
-                        xLocation += distanceUM;
-                        
-                        //if we arrive then end movement
-                        if (xLocation >= xTarget) {
-                            xMoving = false;
-                        }
-                    //moving backwards
-                    } else {
-                        xStepper->moveByStep(-1);
-                        xLocation -= distanceUM;
-                        
-                        //if we arrive then end movement
-                        if (xLocation <= xTarget) {
-                            xMoving = false;
-                        }
-                    }
+        switch (motorState) {
+            case IDLE:
+                break;
+            case WAITING:
+                startMovement();
+                motorState = MOVING;
+                break;
+            case MOVING: {
+                bool isMoving = false;
+                if (xStepper->isMoving()) {
+                    xStepper->tickDriver();
+                    isMoving = true;
                 }
-            }
-            
-            //update y axis movement
-            if (isMovingY()) {
-                unsigned long curDistUM = abs(xLocation - xStart);
-                unsigned long curMMperMin = calcCurMMPerMin(curTimeMS, curDistUM);
-                
-                if (curMMperMin <= ySpeed) {
-                    long distanceUM = Y_UM_PER_STEP;
-                    
-                    //moving forward
-                    if (yTarget > yLocation) {
-                        yStepper->moveByStep(1);
-                        yLocation += distanceUM;
-                        
-                        //if we arrive then end movement
-                        if (yLocation >= yTarget) {
-                            yMoving = false;
-                        }
-                    //moving backwards
-                    } else {
-                        yStepper->moveByStep(-1);
-                        yLocation -= distanceUM;
-                        
-                        //if we arrive then end movement
-                        if (yLocation <= yTarget) {
-                            yMoving = false;
-                        }
-                    }
+                if (yStepper->isMoving()) {
+                    yStepper->tickDriver();
+                    isMoving = true;
                 }
+                
+                // if both motors are finished, then stop ticking
+                if (!isMoving) {
+                    motorState = IDLE;
+                }
+                break;
             }
-        
-            // if we aren't moving now, then both axis finished
-            if (!isMoving()) {
-                timeArrived = millis();
-            }
+            default:
+                //should not happen
+                motorState = IDLE;
+                break;
         }
     }
     
     void cancelMovement() {
-        xMoving = false;
-        yMoving = false;
+        motorState = IDLE;
         
         xTarget = xLocation;
         yTarget = yLocation;
@@ -210,11 +196,11 @@ namespace plotter {
     }
     
     
-    long getXLocation() {
+    dist_um getXLocation() {
         return xLocation;
     }
     
-    long getYLocation() {
+    dist_um getYLocation() {
         return yLocation;
     }
 }

@@ -7,4 +7,7 @@ void laserSetup();
 //Main loop
 void laserLoop();
 
+// Shut down machine
+void shutdownMachine();
+
 #endif //LASERFW_H

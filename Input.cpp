@@ -1,6 +1,7 @@
 #include "Input.h"
 #include <Arduino.h>
 #include "Config.h"
+#include "LaserFW.h"
 
 namespace input {
     // 1 extra space for null byte
@@ -84,8 +85,7 @@ namespace input {
                 break;
             case M11:
                 if (ch == '2') {
-                    //TODO e-stop
-                    //gcode::execute(new gcode::Field('M', 112, 112.0), new gcode::FieldList);
+                    shutdownMachine();
                     return true;
                 } else {
                     immState = NONE;

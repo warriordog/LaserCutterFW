@@ -23,6 +23,9 @@ namespace plotter {
     unsigned long getTimeArrived();
     
     void updateMovement();
+    
+    // cancel in progress movement
+    void cancelMovement();
 }
 
 #endif //PLOTTER_H

@@ -2,6 +2,7 @@
 #include "Plotter.h"
 #include "Laser.h"
 #include "Parser.h"
+#include "LaserFW.h"
 
 namespace gcode {
     // 0 is idle, 1 is code-default, everything else is code-specific
@@ -126,9 +127,7 @@ namespace gcode {
                     switch (currCommand->iNum) {
                         // M0 unconditional stop
                         case 0:
-                            laser::laserPowerOff();
-                            parser::clearBuffer();
-                            currState = 0;
+                            shutdownMachine();
                             break;
                         //M03 spindle on
                         case 3:

@@ -10,3 +10,10 @@ void laserLoop() {
     
 }
 
+
+void shutdownMachine() {
+    plotter::cancelMovement();
+    laser::laserPowerOff();
+    parser::clearBuffer();
+}
+

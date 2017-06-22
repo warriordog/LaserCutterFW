@@ -196,4 +196,14 @@ namespace plotter {
             }
         }
     }
+    
+    void cancelMovement() {
+        xMoving = false;
+        yMoving = false;
+        
+        xTarget = xLocation;
+        yTarget = yLocation;
+        
+        timeArrived = millis();
+    }
 }

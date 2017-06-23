@@ -4,6 +4,8 @@
 #include "Plotter.h"
 #include <Arduino.h>
 #include "Laser.h"
+#include "Input.h"
+#include "Units.h"
 
 namespace safety {
     // if true, then the laser is shut off until it moves
@@ -11,16 +13,22 @@ namespace safety {
     int laserLevel = 0;
     long lastMoveX = 0;
     long lastMoveY = 0;
-    unsigned long lastMoveTime = 0;
+    time_ms lastMoveTime = 0;
+    
+    time_us lastTickTime = 0;
+    time_us totTickDuration = 0;
+    unsigned long numTicks = 0;
     
     // Forward declarations
     void checkLaserDwell();
+    void updateTickTime();
     
     void setup() {
         wdt_enable(WDTO_4S);
     }
     
     void tick() {
+        updateTickTime();
         checkLaserDwell();
         wdt_reset();
     }
@@ -57,5 +65,55 @@ namespace safety {
         // if laser has moved, then we already checked above.  If not, then this does nothing.
         lastMoveX = plotter::getXLocation();
         lastMoveY = plotter::getYLocation();
+    }
+    
+    void updateTickTime() {
+        time_us currTime = micros();
+        time_us thisDur = currTime - lastTickTime;
+        
+        // record and increment tick duration
+        time_us lastTotDur = totTickDuration;
+        totTickDuration += thisDur;
+        
+        // record and increment number of ticks
+        time_us lastNumTicks = numTicks;
+        numTicks++;
+        
+        // check for overflow and reset
+        if (totTickDuration < lastTotDur || numTicks < lastNumTicks) {
+            totTickDuration = (lastTotDur / lastNumTicks) + thisDur;
+            numTicks = 2;
+        }
+        
+        lastTickTime = currTime;    
+    }
+    
+    time_us getAvgTickDuration() {
+        if (numTicks == 0) {
+            return 0;
+        }
+        return totTickDuration / numTicks;
+    }
+    
+    void printDebug() {
+        input::sendMessage(F("safety::laserSafetyEngaged="));
+        input::sendBool(laserSafetyEngaged);
+        input::sendMessage(F("\nsafety::laserLevel="));
+        input::sendInt(laserLevel);
+        input::sendMessage(F("\nsafety::lastMoveX="));
+        input::sendLong(lastMoveX);
+        input::sendMessage(F("\nsafety::lastMoveY="));
+        input::sendLong(lastMoveY);
+        input::sendMessage(F("\nsafety::lastMoveTime="));
+        input::sendULong(lastMoveTime);
+        input::sendMessage(F("\nsafety::lastTickTime="));
+        input::sendULong(lastTickTime);
+        input::sendMessage(F("\nsafety::totTickDuration="));
+        input::sendULong(totTickDuration);
+        input::sendMessage(F("\nsafety::numTicks="));
+        input::sendULong(numTicks);
+        input::sendMessage(F("\nsafety::getAvgTickDuration()="));
+        input::sendULong(getAvgTickDuration());
+        input::sendChar('\n');
     }
 }

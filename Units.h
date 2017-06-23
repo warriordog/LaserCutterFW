@@ -20,6 +20,7 @@ typedef unsigned long dist_mm_u;
 typedef unsigned long dist_um_u;
 
 // time
+typedef unsigned long time_us;
 typedef unsigned long time_ms;
 typedef unsigned long time_sec;
 typedef unsigned long time_min;
@@ -69,6 +70,8 @@ dist_mm umToMm(dist_um um);
 dist_um_u mmToUm_u(dist_mm_u mm);
 dist_mm_u umToMm_u(dist_um_u um);
 
+time_ms usToMs(time_us us);
+time_us msToUs(time_ms ms);
 time_sec minToSec(time_min min);
 time_ms secToMs(time_sec sec);
 time_min secToMin(time_sec sec);

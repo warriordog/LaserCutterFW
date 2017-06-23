@@ -6,6 +6,7 @@
 #include "Input.h"
 #include "Lights.h"
 #include "Scheduler.h"
+#include "Safety.h"
 
 namespace gcode {
     // 0 is idle, 1 is code-default, everything else is code-specific
@@ -202,6 +203,7 @@ namespace gcode {
                             input::printDebug();
                             parser::printDebug();
                             plotter::printDebug();
+                            safety::printDebug();
                             //scheduler::printDebug();
                             input::sendMessage(F("EOL\n"));
                             currState = 0;

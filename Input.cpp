@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include "Config.h"
 #include "LaserFW.h"
+#include "GCode.h"
 
 namespace input {
     // 1 extra space for null byte
@@ -68,12 +69,6 @@ namespace input {
                     nextBufferIdx = 0;
                     bufferState = READY;
                     
-                    /*
-                    Serial.print(F("Ready: '"));
-                    Serial.print(buffer);
-                    Serial.println('\'');
-                    */
-                    
                     sendMessage(F("OK\n"));
                 // don't read into full buffer, just ignore the byte and wait for newline
                 } else if (bufferState != OVERFLOW) {
@@ -92,8 +87,6 @@ namespace input {
     
     String* takeLine() {
         String* str = new String(buffer);
-        //Serial.print(F("Taking: "));
-        //Serial.println(str->c_str());
         nextBufferIdx = 0;
         bufferState = EMPTY;
         return str;
@@ -123,6 +116,9 @@ namespace input {
                 if (ch == 'M') {
                     immState = M;
                     return true;
+                } else if (ch == 'I') {
+                    immState = I;
+                    return true;
                 }
                 break;
             case M:
@@ -147,9 +143,21 @@ namespace input {
                 if (ch == '2') {
                     sendMessage(F("OK\n"));
                     shutdownMachine();
+                    immState = NONE;
                     return true;
                 } else {
                     immWriteBack('M', '1', '1');
+                    immState = NONE;
+                }
+                break;
+            case I:
+                if (ch == '0') {
+                    sendMessage(F("OK\n"));
+                    gcode::abortCurrentCommand();
+                    immState = NONE;
+                    return true;
+                } else {
+                    immWriteBack('I');
                     immState = NONE;
                 }
                 break;
@@ -173,7 +181,7 @@ namespace input {
         Serial.print(strlen(temp));
         Serial.print(F("/'"));
         Serial.print(buffer);
-        Serial.print(F("'\n'"));
+        Serial.print(F("'\n"));
         
         Serial.print(F("input::nextBufferIdx="));
         Serial.println(nextBufferIdx);

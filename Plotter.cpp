@@ -22,8 +22,8 @@ namespace plotter {
     */
     
     //movement speed of axis (mm / min)
-    mm_per_min xSpeed = 0;
-    mm_per_min ySpeed = 0;
+    mm_per_min xSpeed = DEF_X_FEED;
+    mm_per_min ySpeed = DEF_Y_FEED;
 
     /*
         Current state
@@ -64,17 +64,27 @@ namespace plotter {
     
     void setTarget(dist_um x, dist_um y) {setTargetX(x); setTargetY(y);}
     
-    void setXSpeed(mm_per_min vel) {xSpeed = vel;}
-    void setYSpeed(mm_per_min vel) {ySpeed = vel;}
+    void setXSpeed(mm_per_sec vel) {
+        if (vel > MAX_X_FEED) {
+            vel = MAX_X_FEED;
+        }
+        xSpeed = vel;
+    }
+    void setYSpeed(mm_per_sec vel) {
+        if (vel > MAX_Y_FEED) {
+            vel = MAX_Y_FEED;
+        }
+        ySpeed = vel;
+    }
     
-    bool isMoving() {return motorState == MOVING;}
+    bool isMoving() {return motorState != IDLE;}
 
     void setTargetX(dist_um target) {
-        if (target < X_AXIS_MIN) {
-            target = X_AXIS_MIN;
+        if (target < mmToUm(X_AXIS_MIN)) {
+            target = mmToUm(X_AXIS_MIN);
         }
-        if (target > X_AXIS_MAX) {
-            target = X_AXIS_MAX;
+        if (target > mmToUm(X_AXIS_MAX)) {
+            target = mmToUm(X_AXIS_MAX);
         }
         if (target != xLocation) {
             xTarget = target;
@@ -83,16 +93,34 @@ namespace plotter {
     }
     
     void setTargetY(dist_um target) {
-        if (target < Y_AXIS_MIN) {
-            target = Y_AXIS_MIN;
+        if (target < mmToUm(Y_AXIS_MIN)) {
+            target = mmToUm(Y_AXIS_MIN);
         }
-        if (target > Y_AXIS_MAX) {
-            target = Y_AXIS_MAX;
+        if (target > mmToUm(Y_AXIS_MAX)) {
+            target = mmToUm(Y_AXIS_MAX);
         }
         if (target != yLocation) {
             yTarget = target;
             motorState = WAITING;
         }
+    }
+    
+    
+    void setTargetX(dist_mm_d x) {
+        dist_um um = mmToUm(x.mm);
+        um += x.dec;
+        setTargetX(um);
+    }
+    
+    void setTargetY(dist_mm_d y) {
+        dist_um um = mmToUm(y.mm);
+        um += y.dec;
+        setTargetY(um);
+    }
+    
+    void setTarget(dist_mm_d x, dist_mm_d y) {
+        setTargetX(x);
+        setTargetY(y);
     }
 
     /*
@@ -103,36 +131,45 @@ namespace plotter {
         motorState = IDLE;
     
         dist_um xDist = abs(xTarget - xLocation);
-        dist_um yDist = abs(yTarget - yLocation);
+        
+        //Serial.println(xSpeed);
+        //Serial.println(ySpeed);
         
         if (xDist != 0) {
-            step_step steps = calcStepsForUm(xDist);
+            //Serial.println(xDist);
+            step_step steps = calcStepsForUm(xDist, X_STEPS_PER_MM);
             if (xTarget < xLocation) {
                 steps *= -1;
             }
             
-            step_rpm rpm = calcRPM(xDist, xSpeed);
+            step_rpm rpm = calcRPM(X_STEPS_PER_MM, xSpeed);
+            //Serial.println(rpm);
             if (rpm > MAX_RPM) {
                 rpm = MAX_RPM;
             }
+            //Serial.println(rpm);
             xStepper->setRPM(rpm);
             
+            //Serial.println(steps);
             xStepper->moveByStep(steps);
             motorState = MOVING;
         }
         
+        dist_um yDist = abs(yTarget - yLocation);
         if (yDist != 0) {
-            step_step steps = calcStepsForUm(yDist);
+            step_step steps = calcStepsForUm(yDist, Y_STEPS_PER_MM);
             if (yTarget < yLocation) {
                 steps *= -1;
             }
             
-            step_rpm rpm = calcRPM(xDist, ySpeed);
+            step_rpm rpm = calcRPM(Y_STEPS_PER_MM, ySpeed);
             if (rpm > MAX_RPM) {
                 rpm = MAX_RPM;
             }
+            //Serial.println(rpm);
             yStepper->setRPM(rpm);
             
+            //Serial.println(steps);
             yStepper->moveByStep(steps);
             motorState = MOVING;
         }
@@ -159,9 +196,11 @@ namespace plotter {
                     yStepper->tickDriver();
                     isMoving = true;
                 }
-                
+
                 // if both motors are finished, then stop ticking
                 if (!isMoving) {
+                    xLocation = xTarget;
+                    yLocation = yTarget;
                     motorState = IDLE;
                 }
                 break;

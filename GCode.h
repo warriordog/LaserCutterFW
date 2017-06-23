@@ -25,6 +25,7 @@ namespace gcode {
     void execute(Field* command, FieldList* args);
     bool isWorking();
     void update();
+    void abortCurrentCommand();
 }
 
 #endif //GCODE_H

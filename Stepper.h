@@ -2,6 +2,7 @@
 #define STEPPER_H
 
 #include "BasicStepperDriver.h"
+#include "Units.h"
 
 namespace stepper {
     class Stepper {
@@ -11,8 +12,9 @@ namespace stepper {
             GPIO_pin_t enablePin;
             
             BasicStepperDriver driver;
+            step_step lastCommandSteps;
             
-            bool isEnabled;
+            bool isEnabled = true;
         public:
             Stepper(GPIO_pin_t stepPin, GPIO_pin_t directionPin, GPIO_pin_t enablePin);
         
@@ -26,13 +28,14 @@ namespace stepper {
             }
             bool checkEnabled() {return isEnabled;}
             
-            void moveByDeg(int degrees);
-            void moveByStep(int steps);
+            void moveByDeg(step_deg degrees);
+            void moveByStep(step_step steps);
             
             void setRPM(int rpm);
             
             void tickDriver();
             bool isMoving();
+            step_step getCurrentProgress();
             
             void printDebug();
     };

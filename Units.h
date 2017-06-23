@@ -25,8 +25,8 @@ typedef unsigned long time_sec;
 typedef unsigned long time_min;
 
 // steppers
-typedef unsigned long step_step;
-typedef unsigned long step_deg;
+typedef long step_step;
+typedef long step_deg;
 
 /*
     Composite types
@@ -78,9 +78,6 @@ mm_per_min mmPerMin(dist_mm mm, time_min min);
 mm_per_sec mmPerSec(dist_mm mm, time_sec sec);
 um_per_sec umPerSec(dist_um um, time_sec sec);
 
-step_step degToStep(step_deg deg);
-step_deg stepToDeg(step_step step);
-
 step_per_min stepPerMin(step_step step, time_min min);
 step_per_sec stepPerSec(step_step step, time_sec sec);
 step_per_ms stepPerMs(step_step step, time_ms ms);
@@ -90,7 +87,7 @@ step_per_um stepPerUm(step_step step, dist_um um);
 
 dist_mm_d umToMm_dec(dist_um um);
 
-step_step calcStepsForUm(dist_um um);
-step_rpm calcRPM(dist_um um, mm_per_min speed);
+step_step calcStepsForUm(dist_um um, step_per_mm stepsMM);
+step_rpm calcRPM(step_per_mm stepMM, mm_per_min mmMin);
 
 #endif //UNITS_H

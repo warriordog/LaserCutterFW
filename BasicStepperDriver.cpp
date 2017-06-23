@@ -29,15 +29,15 @@ BasicStepperDriver::BasicStepperDriver(int steps, GPIO_pin_t dir_pin, GPIO_pin_t
 }
 
 void BasicStepperDriver::init(void){
-    pinMode2(dir_pin, OUTPUT);
-    digitalWrite2(dir_pin, HIGH);
+    pinMode2f(dir_pin, OUTPUT);
+    digitalWrite2f(dir_pin, HIGH);
 
-    pinMode2(step_pin, OUTPUT);
-    digitalWrite2(step_pin, LOW);
+    pinMode2f(step_pin, OUTPUT);
+    digitalWrite2f(step_pin, LOW);
 
     if IS_CONNECTED(enable_pin){
-        pinMode2(enable_pin, OUTPUT);
-        digitalWrite2(enable_pin, HIGH); // disable
+        pinMode2f(enable_pin, OUTPUT);
+        digitalWrite2f(enable_pin, HIGH); // disable
     }
 
     setMicrostep(1);
@@ -78,7 +78,7 @@ unsigned BasicStepperDriver::setMicrostep(unsigned microsteps){
  * DIR: forward HIGH, reverse LOW
  */
 void BasicStepperDriver::setDirection(int direction){
-    digitalWrite2(dir_pin, (direction<0) ? LOW : HIGH);
+    digitalWrite2f(dir_pin, (direction<0) ? LOW : HIGH);
 }
 
 /*
@@ -104,10 +104,10 @@ void BasicStepperDriver::move(long steps){
     //wait for update tick instead of running here
     /*
     while (steps--){
-        digitalWrite2(step_pin, HIGH);
+        digitalWrite2f(step_pin, HIGH);
         unsigned long next_edge = micros() + pulse_duration;
         microWaitUntil(next_edge);
-        digitalWrite2(step_pin, LOW);
+        digitalWrite2f(step_pin, LOW);
         microWaitUntil(next_edge + pulse_duration);
     }
     */
@@ -135,13 +135,13 @@ void BasicStepperDriver::rotate(double deg){
  */
 void BasicStepperDriver::enable(void){
     if IS_CONNECTED(enable_pin){
-        digitalWrite2(enable_pin, LOW);
+        digitalWrite2f(enable_pin, LOW);
     }
 }
 
 void BasicStepperDriver::disable(void){
     if IS_CONNECTED(enable_pin){
-        digitalWrite2(enable_pin, HIGH);
+        digitalWrite2f(enable_pin, HIGH);
     }
 }
 
@@ -153,9 +153,19 @@ unsigned BasicStepperDriver::getMaxMicrostep(){
 void BasicStepperDriver::tickMovement() {
     if (isMoving()) {
         if (micros() - last_step_time > pulse_duration) {
+            //digitalWrite2f(step_pin, HIGH);
+            //microWaitUntil(micros() + pulse_duration);
+            //digitalWrite2f(step_pin, LOW);
+            //last_step_time = micros();
+            
             pulse_state = !pulse_state;
-            digitalWrite2(step_pin, pulse_state);
-            steps_remaining--;
+            digitalWrite2f(step_pin, pulse_state);
+            
+            //only decrement after a HIGH and LOW cycle
+            if (pulse_state == LOW) {
+                steps_remaining--;
+            }
+            last_step_time = micros();
         }
     }
 }
@@ -163,4 +173,8 @@ void BasicStepperDriver::tickMovement() {
 
 bool BasicStepperDriver::isMoving() {
     return steps_remaining > 0;
+}
+
+long BasicStepperDriver::getStepsRemaining() {
+    return steps_remaining;
 }

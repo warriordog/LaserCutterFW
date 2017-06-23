@@ -9,6 +9,7 @@ namespace parser {
     bool hasQueueSpace();
     void addLine(String* string); 
     void clearBuffer();
+    void abortCurrentCommand();
     
     void printDebug();
 }

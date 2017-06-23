@@ -65,7 +65,7 @@ protected:
     virtual unsigned getMaxMicrostep();
 
     //steps remaining in this movement
-    int steps_remaining = 0;
+    long steps_remaining = 0;
     //time of last movement
     unsigned long last_step_time;
     //duration of this movement
@@ -115,5 +115,6 @@ public:
     
     void tickMovement();
     bool isMoving();
+    long getStepsRemaining();
 };
 #endif // STEPPER_DRIVER_BASE_H

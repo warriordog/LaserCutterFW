@@ -6,14 +6,14 @@
 */
 
 // X-axis
-#define PIN_X_STEP          DP54
-#define PIN_X_DIR           DP55
-#define PIN_X_EN            DP38
+#define PIN_X_STEP          DP46 // use z axis
+#define PIN_X_DIR           DP48 // use z axis
+#define PIN_X_EN            DP62 // use z axis
 
 // Y-axis
-#define PIN_Y_STEP          DP46 // use z axis
-#define PIN_Y_DIR           DP48 // use z axis
-#define PIN_Y_EN            DP62 // use z axis
+#define PIN_Y_STEP          DP60
+#define PIN_Y_DIR           DP61
+#define PIN_Y_EN            DP56
 
 // Laser
 #define PIN_LASER_POWER     DP8
@@ -26,9 +26,7 @@
 #define PIN_LED_LIFE        13          // pulses while board running (PWM)
 
 // Motors
-#define MOTOR_MICROSTEPS    16          // Microsteps per full step
+#define MOTOR_MICROSTEPS    16          // Microsteps enabled
 #define STEPS_PER_ROTATION  200L        // Full steps reuired per rotation
-#define DEGREES_PER_STEP    1.8         // 1.8 degrees / step
-#define STEPS_PER_DEGREE    0.55556     // 1.8 degrees / step
 
 #endif //CONSTANTS_H

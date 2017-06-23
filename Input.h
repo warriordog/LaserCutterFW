@@ -21,7 +21,8 @@ namespace input {
         NONE,
         M,
         M1,
-        M11
+        M11,
+        I
     };
 
     void setup();

@@ -63,6 +63,11 @@ namespace gcode {
         return currState != 0;
     }
     
+    void abortCurrentCommand() {
+        execute(nullptr, nullptr);
+        currState = 0;
+    }
+    
     Field* findField(char letter) {
         if (currArgs != nullptr) {
             for (FieldNode* node = currArgs->getHead(); node != nullptr; node = node->next) {
@@ -176,21 +181,28 @@ namespace gcode {
                             currState = 0;
                             break;
                         //M114 get position
-                        case 114:
+                        case 114: {
                             input::sendMessage(F("M114 X:"));
-                            input::sendInt(plotter::getXLocation());
+                            dist_mm_d x = umToMm_dec(plotter::getXLocation());
+                            input::sendInt(x.mm);
+                            input::sendChar('.');
+                            input::sendInt(x.dec);
                             input::sendMessage(F(" Y:"));
-                            input::sendInt(plotter::getYLocation());
+                            dist_mm_d y = umToMm_dec(plotter::getYLocation());
+                            input::sendInt(y.mm);
+                            input::sendChar('.');
+                            input::sendInt(y.dec);
                             input::sendMessage(F("\n"));
                             currState = 0;
                             break;
+                        }
                         //M145 print internal state
                         case 145:
                             input::sendMessage(F("M145\n"));
                             input::printDebug();
                             parser::printDebug();
                             plotter::printDebug();
-                            scheduler::printDebug();
+                            //scheduler::printDebug();
                             input::sendMessage(F("EOL\n"));
                             currState = 0;
                             break;

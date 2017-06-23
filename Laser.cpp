@@ -9,21 +9,21 @@ namespace laser {
     
     void setup() {
         pinMode(PIN_LASER_TTL, OUTPUT);        
-        pinMode2(PIN_LASER_POWER, OUTPUT);
+        pinMode2f(PIN_LASER_POWER, OUTPUT);
         
         laserPowerOff();
     }
 
     void laserPowerOff() {
         //active high?
-        digitalWrite2(PIN_LASER_POWER, LOW);
+        digitalWrite2f(PIN_LASER_POWER, LOW);
         laserPower = false;
         setLaserLevel(0);
     }
     
     void laserPowerOn() {
         // active high?
-        digitalWrite2(PIN_LASER_POWER, HIGH);
+        digitalWrite2f(PIN_LASER_POWER, HIGH);
         laserPower = true;
     }
     

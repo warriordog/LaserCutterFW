@@ -9,6 +9,9 @@ namespace plotter {
     void setTargetX(dist_um target);
     void setTargetY(dist_um target);
     void setTarget(dist_um x, dist_um y);
+    void setTargetX(dist_mm_d x);
+    void setTargetY(dist_mm_d y);
+    void setTarget(dist_mm_d x, dist_mm_d y);
     
     void setXSpeed(mm_per_min vel);
     void setYSpeed(mm_per_min vel);

@@ -4,7 +4,6 @@
 #include "Input.h"
 
 namespace scheduler {
-    MoveState moveState = IDLE;
 
     void tick() {
         //Serial.println(F("SchedulerTick"));
@@ -32,7 +31,7 @@ namespace scheduler {
         }
     }
     
-    
+    /*
     void printDebug() {
         input::sendMessage(F("scheduler::moveState="));
         switch(moveState) {
@@ -42,4 +41,5 @@ namespace scheduler {
             default: input::sendInt(moveState); input::sendChar('\n');
         }
     }
+    */
 }

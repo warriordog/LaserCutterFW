@@ -13,16 +13,20 @@
 #define Y_AXIS_MIN          0
 #define Y_AXIS_MAX          600     //just under 2 feet
 
-// steps per millimeter
-#define X_STEPS_PER_MM      300L
-#define Y_STEPS_PER_MM      300L
+// microsteps per millimeter
+#define X_STEPS_PER_MM      960L //(60 * 16 microsteps), 5760 is full turn
+#define Y_STEPS_PER_MM      960L //(60 * 16 microsteps), 5760 is full turn
 
-// default feed rates (mm / min)
-#define DEF_X_FEED          1000L
-#define DEF_Y_FEED          1000L
+// default feed rates (mm / m)
+#define DEF_X_FEED          60L
+#define DEF_Y_FEED          60L
+
+// max feed rates (mm / m)
+#define MAX_X_FEED          180L
+#define MAX_Y_FEED          180L
 
 // motor RPM
-#define MAX_RPM             200L
+#define MAX_RPM             250L
 #define DEFAULT_RPM         120L
 
 // Serial baud rate

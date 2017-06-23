@@ -134,7 +134,7 @@ namespace parser {
         }
     
         input::sendMessage(F("parser::lineQueue="));
-        input::sendMessage(temp.count());
+        input::sendInt(temp.count());
         input::sendChar('[');
         
         bool first = true;
@@ -154,7 +154,8 @@ namespace parser {
             lineQueue.push(line);
         }
         
-        input::sendChar(']');
+        input::sendMessage(F("]\nparser::hasWork()="));
+        input::sendBool(hasWork());
         input::sendChar('\n');
     }
 }

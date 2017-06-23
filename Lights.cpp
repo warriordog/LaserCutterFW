@@ -29,10 +29,10 @@ namespace lights {
     void updateActivity() {
         if (actOn) {
             if (millis() - actStart > LED_ACT_DURATION) {
-                digitalWrite2(PIN_LED_ACT, LOW);
+                digitalWrite2f(PIN_LED_ACT, LOW);
                 actOn = false;
             } else {
-                digitalWrite2(PIN_LED_ACT, HIGH);
+                digitalWrite2f(PIN_LED_ACT, HIGH);
             }
         }
     }
@@ -41,26 +41,26 @@ namespace lights {
         if (pwrBlinking) {
             if (millis() - pwrBlinkStart > pwrBlinkDuration) {
                 // make sure LED pin ends in 'ON' state
-                digitalWrite2(PIN_LED_POWER, HIGH);
+                digitalWrite2f(PIN_LED_POWER, HIGH);
                 pwrBlinking = false;
             } else {
                 // turn off or by by interval
                 if (((millis() - pwrBlinkStart) / pwrBlinkInterval) % 2 == 0) {
-                    digitalWrite2(PIN_LED_POWER, HIGH);
+                    digitalWrite2f(PIN_LED_POWER, HIGH);
                 } else {
-                    digitalWrite2(PIN_LED_POWER, LOW);
+                    digitalWrite2f(PIN_LED_POWER, LOW);
                 }
             }
         }
     }
 
     void setup() {
-        pinMode2(PIN_LED_POWER, OUTPUT);
-        pinMode2(PIN_LED_ACT, OUTPUT);
+        pinMode2f(PIN_LED_POWER, OUTPUT);
+        pinMode2f(PIN_LED_ACT, OUTPUT);
         pinMode(PIN_LED_LIFE, OUTPUT);
         
-        digitalWrite2(PIN_LED_POWER, HIGH);
-        digitalWrite2(PIN_LED_ACT, LOW);
+        digitalWrite2f(PIN_LED_POWER, HIGH);
+        digitalWrite2f(PIN_LED_ACT, LOW);
         updateLife();
     }
     
@@ -71,8 +71,8 @@ namespace lights {
     }
     
     void shutdown() {
-        digitalWrite2(PIN_LED_POWER, LOW);
-        digitalWrite2(PIN_LED_ACT, LOW);
+        digitalWrite2f(PIN_LED_POWER, LOW);
+        digitalWrite2f(PIN_LED_ACT, LOW);
         analogWrite(PIN_LED_LIFE, 0);
     }
     

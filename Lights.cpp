@@ -14,16 +14,22 @@ namespace lights {
     unsigned long pwrBlinkInterval = 0;
 
     void updateLife() {
-        // moves from 0 to 510 across ~2 seconds 
-        int lightTime = ((millis() / 4) % 510);
-        
-        //reverse the second half of the spectrum
-        if (lightTime > 255) {
-            lightTime = 255 - (510 - lightTime);
+        if (LED_LIFE_INTERVAL > 0) {
+            // moves from 0 to 510 across ~2 seconds
+            unsigned long lightTime = (millis() % LED_LIFE_INTERVAL);
+            
+            // light value at this time [0-255][255-510]
+            // multiply first to keep numbers big, because integer math
+            int lightVal = (lightTime * 510) / LED_LIFE_INTERVAL;
+            
+            //reverse the second half of the spectrum
+            if (lightVal > 255) {
+                lightVal = 510 - lightVal;
+            }
+            
+            // will be a value from 0 - 255 by now
+            analogWrite(PIN_LED_LIFE, lightVal);
         }
-        
-        // will be a value from 0 - 255 by now
-        analogWrite(PIN_LED_LIFE, lightTime);
     }
 
     void updateActivity() {

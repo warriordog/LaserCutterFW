@@ -51,4 +51,7 @@
     // gcode executed blink
 #define LED_ACT_DURATION    100     // 1/10 of a second
 
+// Time for life LED to complete one pulse-fade cycle (ms)
+#define LED_LIFE_INTERVAL   2000L   // 2 seconds
+
 #endif //CONFIG_H

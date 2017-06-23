@@ -22,6 +22,7 @@ void laserLoop() {
     while (machineRunning) {
         safety::tick(); // rest of loop has 4 seconds to complete or chip resets
         scheduler::tick();
+        lights::tick();
     }
 }
 

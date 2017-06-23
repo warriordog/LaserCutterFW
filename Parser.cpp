@@ -3,6 +3,7 @@
 #include "Config.h"
 #include <QueueArray.h>
 #include "GCode.h"
+#include "Input.h"
 
 namespace parser {
 
@@ -29,8 +30,6 @@ namespace parser {
         
         int idx = 0;
         while (idx < line->length()) {
-            //Serial.print(F("Loop: "));
-            //Serial.println(line->charAt(idx));
         
             char c = line->charAt(idx);
             
@@ -65,15 +64,6 @@ namespace parser {
             char letter = c;
             int start = idx + 1;
             int end = skipToSpace(start, line);
-            
-            /*
-            Serial.print(F("Checking "));
-            Serial.print(c);
-            Serial.print('/');
-            Serial.print(start);
-            Serial.print('/');
-            Serial.println(end);
-            */
             
             // make sure the numbers are in bounds
             if (start < line->length()) {
@@ -135,5 +125,36 @@ namespace parser {
         } else {
         //Serial.println(F("Line null"));
         }
+    }
+    
+    void printDebug() {
+        QueueArray<String*> temp;
+        while (!lineQueue.isEmpty()) {
+            temp.push(lineQueue.pop());
+        }
+    
+        input::sendMessage(F("parser::lineQueue="));
+        input::sendMessage(temp.count());
+        input::sendChar('[');
+        
+        bool first = true;
+        while (!temp.isEmpty()) {
+            if (!first) {
+                input::sendChar(',');
+            }
+            first = false;
+        
+            String* line = temp.pop();
+            if (line == nullptr) {
+                input::sendMessage(F("nullptr"));
+            } else {
+                input::sendString(line->c_str());
+            }
+            
+            lineQueue.push(line);
+        }
+        
+        input::sendChar(']');
+        input::sendChar('\n');
     }
 }

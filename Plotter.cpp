@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include "Constants.h"
 #include "Units.h"
+#include "Input.h"
 
 namespace plotter {
     enum motor_state {
@@ -42,16 +43,6 @@ namespace plotter {
     //target of current movement (um)
     dist_um xTarget = 0;
     dist_um yTarget = 0;
-    
-    //location of axis at start of movement (um)
-    dist_um xStart = 0;
-    dist_um yStart = 0;
-    
-    //time that target location was reached
-    time_ms timeArrived = 0;
-    
-    //time that the current movement started
-    time_ms movementStartTime = 0;
        
     /*
         Motors
@@ -77,8 +68,6 @@ namespace plotter {
     void setYSpeed(mm_per_min vel) {ySpeed = vel;}
     
     bool isMoving() {return motorState == MOVING;}
-    
-    time_ms getTimeArrived() {return timeArrived;}
 
     void setTargetX(dist_um target) {
         if (target < X_AXIS_MIN) {
@@ -90,7 +79,6 @@ namespace plotter {
         if (target != xLocation) {
             xTarget = target;
             motorState = WAITING;
-            movementStartTime = millis();
         }
     }
     
@@ -104,7 +92,6 @@ namespace plotter {
         if (target != yLocation) {
             yTarget = target;
             motorState = WAITING;
-            movementStartTime = millis();
         }
     }
 
@@ -191,8 +178,6 @@ namespace plotter {
         
         xTarget = xLocation;
         yTarget = yLocation;
-        
-        timeArrived = millis();
     }
     
     
@@ -202,5 +187,52 @@ namespace plotter {
     
     dist_um getYLocation() {
         return yLocation;
+    }
+    
+    stepper::Stepper* getXStepper() {
+        return xStepper;
+    }
+    
+    stepper::Stepper* getYStepper() {
+        return yStepper;
+    }
+    
+    void printDebug() {
+        input::sendMessage(F("plotter::xSpeed="));
+        input::sendLong(xSpeed);
+        input::sendMessage(F("\nplotter::ySpeed="));
+        input::sendLong(ySpeed);
+        input::sendMessage(F("\nplotter::xLocation="));
+        input::sendLong(xLocation);
+        input::sendMessage(F("\nplotter::yLocation="));
+        input::sendLong(yLocation);
+        input::sendMessage(F("\nplotter::xTarget="));
+        input::sendLong(xTarget);
+        input::sendMessage(F("\nplotter::yTarget="));
+        input::sendLong(yTarget);
+        
+        input::sendMessage(F("\nplotter::motorState="));
+        switch(motorState) {
+            case IDLE: input::sendMessage(F("IDLE\n")); break;
+            case WAITING: input::sendMessage(F("WAITING\n")); break;
+            case MOVING: input::sendMessage(F("MOVING\n")); break;
+            default: input::sendInt(motorState); input::sendChar('\n');
+        }
+        
+        input::sendMessage(F("plotter::xStepper="));
+        if (xStepper == nullptr) {
+            input::sendMessage(F("nullptr\n"));
+        } else {
+            input::sendChar('\n');
+            xStepper->printDebug();
+        }
+        
+        input::sendMessage(F("plotter::yStepper="));
+        if (yStepper == nullptr) {
+            input::sendMessage(F("nullptr\n"));
+        } else {
+            input::sendChar('\n');
+            yStepper->printDebug();
+        }
     }
 }

@@ -9,6 +9,8 @@ namespace parser {
     bool hasQueueSpace();
     void addLine(String* string); 
     void clearBuffer();
+    
+    void printDebug();
 }
 
 #endif //PARSER_H

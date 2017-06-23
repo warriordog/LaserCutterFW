@@ -18,12 +18,15 @@ namespace plotter {
     dist_um getXLocation();
     dist_um getYLocation();
     
-    time_ms getTimeArrived();
-    
     void updateMovement();
     
     // cancel in progress movement
     void cancelMovement();
+    
+    stepper::Stepper* getXStepper();
+    stepper::Stepper* getYStepper();
+    
+    void printDebug();
 }
 
 #endif //PLOTTER_H

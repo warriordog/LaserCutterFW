@@ -2,6 +2,7 @@
 #include "BasicStepperDriver.h"
 #include "Config.h"
 #include "Constants.h"
+#include "Input.h"
 
 namespace stepper {
     Stepper::Stepper (GPIO_pin_t stepPin, GPIO_pin_t directionPin, GPIO_pin_t enablePin)
@@ -9,16 +10,6 @@ namespace stepper {
         : driver(STEPS_PER_ROTATION, directionPin, stepPin, enablePin) {
         driver.setRPM(DEFAULT_RPM); //120 RPM is safe
         driver.setMicrostep(MOTOR_MICROSTEPS); //jumpers set to 128, but controllers only support 16
-    }
-
-    void Stepper::moveToDeg (int degrees) {
-        if (isEnabled) {
-            //limit to good range
-            //degrees = degrees % 360;
-            
-            int diff = degrees - currPosition;
-            moveByDeg(diff);
-        }
     }
 
     void Stepper::moveByDeg (int degrees) {
@@ -54,5 +45,17 @@ namespace stepper {
     
     bool Stepper::isMoving() {
         return driver.isMoving();
+    }
+    
+    void Stepper::printDebug() {
+        input::sendMessage(F("stepper::Stepper.stepPin="));
+        input::sendInt(stepPin);
+        input::sendMessage(F("\nstepper::Stepper.dirPin="));
+        input::sendInt(dirPin);
+        input::sendMessage(F("\nstepper::Stepper.enablePin="));
+        input::sendInt(enablePin);
+        input::sendMessage(F("\nstepper::Stepper.isEnabled="));
+        input::sendBool(isEnabled);
+        input::sendChar('\n');
     }
 }

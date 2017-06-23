@@ -5,6 +5,7 @@
 #include "LaserFW.h"
 #include "Input.h"
 #include "Lights.h"
+#include "Scheduler.h"
 
 namespace gcode {
     // 0 is idle, 1 is code-default, everything else is code-specific
@@ -26,13 +27,6 @@ namespace gcode {
     }
     
     void FieldList::add(Field* field) {
-    /*
-        Serial.print(F("Adding: '"));
-        Serial.print(field->letter);
-        Serial.print(field->iNum);
-        Serial.println('\'');
-      
-      */
         if (head == nullptr) {
             head = new FieldNode;
             head->field = field;
@@ -62,22 +56,6 @@ namespace gcode {
         
         if (currCommand != nullptr) {
             currState = 1;
-            
-            /*
-            input::sendMessage(F("Executing: '"));
-            input::sendChar(currCommand->letter);
-            input::sendInt(currCommand->iNum);
-            
-            if (currArgs != nullptr) {
-                for (FieldNode* node = currArgs->getHead(); node != nullptr; node = node->next) {
-                    input::sendMessage(F(" "));
-                    input::sendChar(node->field->letter);
-                    input::sendInt(node->field->iNum);
-                }
-            }
-            
-            input::sendMessage(F("'\n"));
-            */
         }
     }
     
@@ -163,6 +141,7 @@ namespace gcode {
                     switch (currCommand->iNum) {
                         // M0 unconditional stop
                         case 0:
+                            input::sendMessage(F("M0 Shutting down."));
                             shutdownMachine();
                             currState = 0;
                             break;
@@ -184,6 +163,18 @@ namespace gcode {
                             laser::laserPowerOff();
                             currState = 0;
                             break;
+                        //enable all motors
+                        case 17:
+                            plotter::getXStepper()->enable();
+                            plotter::getYStepper()->enable();
+                            currState = 0;
+                            break;
+                        //disable all motors
+                        case 18:
+                            plotter::getXStepper()->disable();
+                            plotter::getYStepper()->disable();
+                            currState = 0;
+                            break;
                         //M114 get position
                         case 114:
                             input::sendMessage(F("M114 X:"));
@@ -191,6 +182,16 @@ namespace gcode {
                             input::sendMessage(F(" Y:"));
                             input::sendInt(plotter::getYLocation());
                             input::sendMessage(F("\n"));
+                            currState = 0;
+                            break;
+                        //M145 print internal state
+                        case 145:
+                            input::sendMessage(F("M145\n"));
+                            input::printDebug();
+                            parser::printDebug();
+                            plotter::printDebug();
+                            scheduler::printDebug();
+                            input::sendMessage(F("EOL\n"));
                             currState = 0;
                             break;
                         // invalid

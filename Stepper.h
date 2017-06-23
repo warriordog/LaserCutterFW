@@ -12,7 +12,6 @@ namespace stepper {
             
             BasicStepperDriver driver;
             
-            int currPosition;
             bool isEnabled;
         public:
             Stepper(GPIO_pin_t stepPin, GPIO_pin_t directionPin, GPIO_pin_t enablePin);
@@ -27,7 +26,6 @@ namespace stepper {
             }
             bool checkEnabled() {return isEnabled;}
             
-            void moveToDeg(int degrees);
             void moveByDeg(int degrees);
             void moveByStep(int steps);
             
@@ -35,6 +33,8 @@ namespace stepper {
             
             void tickDriver();
             bool isMoving();
+            
+            void printDebug();
     };
 }
 

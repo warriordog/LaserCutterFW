@@ -25,9 +25,13 @@ namespace input {
     };
 
     void setup();
-
+    
     void sendMessage(const __FlashStringHelper* message);
+    void sendString(char* str);
     void sendInt(int val);
+    void sendLong(long val);
+    void sendULong(unsigned long val);
+    void sendBool(bool val);
     void sendChar(char chr);
 
     bool lineReady();
@@ -35,6 +39,8 @@ namespace input {
     String* takeLine();
     
     bool updateImmediateHandler(int chr);
+    
+    void printDebug();
 }
 
 #endif //INPUT_H

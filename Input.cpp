@@ -29,6 +29,22 @@ namespace input {
     void sendChar(char chr) {
         Serial.print(chr);
     }
+    
+    void sendString(char* str) {
+        Serial.print(str);
+    }
+    
+    void sendLong(long val) {
+        Serial.print(val);
+    }
+    
+    void sendULong(unsigned long val) {
+        Serial.print(val);
+    }
+    
+    void sendBool(bool val) {
+        Serial.print(val);
+    }
 
     bool lineReady() {
         return bufferState == READY;
@@ -143,5 +159,32 @@ namespace input {
                 break;
         }
         return false;
+    }
+    
+    void printDebug() {
+        //create a temp buffer with a null byte in case too big
+        char temp[MAX_GCODE_LENGTH + 2];
+        for (int i = 0; i <= MAX_GCODE_LENGTH; i++) {
+            temp[i] = buffer[i];
+        }
+        temp[MAX_GCODE_LENGTH + 1] = 0;
+        
+        Serial.print(F("input::buffer="));//
+        Serial.print(strlen(temp));
+        Serial.print(F("/'"));
+        Serial.print(buffer);
+        Serial.print(F("'\n'"));
+        
+        Serial.print(F("input::nextBufferIdx="));
+        Serial.println(nextBufferIdx);
+        
+        Serial.print(F("input::bufferState="));
+        switch(bufferState) {
+            case EMPTY: Serial.print(F("EMPTY\n")); break;
+            case BUILDING: Serial.print(F("BUILDING\n")); break;
+            case READY: Serial.print(F("READY\n")); break;
+            case OVERFLOW: Serial.print(F("OVERFLOW\n")); break;
+            default: Serial.println(bufferState);
+        }
     }
 }

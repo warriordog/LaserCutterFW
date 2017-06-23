@@ -14,6 +14,7 @@ namespace scheduler {
     };
     
     void tick();
+    void printDebug();
 }
 
 #endif //SCHEDULER_H

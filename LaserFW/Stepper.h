@@ -7,16 +7,16 @@
 namespace stepper {
     class Stepper {
         private:
-            GPIO_pin_t stepPin;
-            GPIO_pin_t dirPin;
-            GPIO_pin_t enablePin;
+            int stepPin;
+            int dirPin;
+            int enablePin;
             
             BasicStepperDriver driver;
             step_step lastCommandSteps;
             
             bool isEnabled = true;
         public:
-            Stepper(GPIO_pin_t stepPin, GPIO_pin_t directionPin, GPIO_pin_t enablePin);
+            Stepper(int stepPin, int directionPin, int enablePin);
         
             void enable() {
                 isEnabled = true;

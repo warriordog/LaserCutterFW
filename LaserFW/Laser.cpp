@@ -1,7 +1,6 @@
 #include "Laser.h"
 #include "Constants.h"
 #include <Arduino.h>
-#include <arduino2.h>
 
 namespace laser {
     bool laserPower = false;
@@ -9,21 +8,21 @@ namespace laser {
     
     void setup() {
         pinMode(PIN_LASER_TTL, OUTPUT);        
-        pinMode2f(PIN_LASER_POWER, OUTPUT);
+        pinMode(PIN_LASER_POWER, OUTPUT);
         
         laserPowerOff();
     }
 
     void laserPowerOff() {
         //active high?
-        digitalWrite2f(PIN_LASER_POWER, LOW);
+        digitalWrite(PIN_LASER_POWER, LOW);
         laserPower = false;
         setLaserLevel(0);
     }
     
     void laserPowerOn() {
         // active high?
-        digitalWrite2f(PIN_LASER_POWER, HIGH);
+        digitalWrite(PIN_LASER_POWER, HIGH);
         laserPower = true;
     }
     

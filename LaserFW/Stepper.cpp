@@ -6,7 +6,7 @@
 #include "Units.h"
 
 namespace stepper {
-    Stepper::Stepper(GPIO_pin_t stepPin, GPIO_pin_t directionPin, GPIO_pin_t enablePin)
+    Stepper::Stepper(int stepPin, int directionPin, int enablePin)
         //create stepper with 1.8 degrees / step
         : driver(STEPS_PER_ROTATION, directionPin, stepPin, enablePin) {
         driver.setRPM(DEFAULT_RPM); //120 RPM is safe

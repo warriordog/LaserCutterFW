@@ -4,7 +4,6 @@
  *
  * Copyright (C)2015 Laurentiu Badea
  *
- * Modified to use dio2 library for fast IO.  Normal arduino digitalWrite/etc are replaced with digitalWrite2/etc2.
  * Modified to step asynchronously.
  *
  * This file may be redistributed under the terms of the MIT license.
@@ -16,28 +15,28 @@
  * Basic connection: only DIR, STEP are connected.
  * Microstepping controls should be hardwired.
  */
-BasicStepperDriver::BasicStepperDriver(int steps, GPIO_pin_t dir_pin, GPIO_pin_t step_pin)
+BasicStepperDriver::BasicStepperDriver(int steps, int dir_pin, int step_pin)
 :motor_steps(steps), dir_pin(dir_pin), step_pin(step_pin)
 {
     init();
 }
 
-BasicStepperDriver::BasicStepperDriver(int steps, GPIO_pin_t dir_pin, GPIO_pin_t step_pin, GPIO_pin_t enable_pin)
+BasicStepperDriver::BasicStepperDriver(int steps, int dir_pin, int step_pin, int enable_pin)
 :motor_steps(steps), dir_pin(dir_pin), step_pin(step_pin), enable_pin(enable_pin)
 {
     init();
 }
 
 void BasicStepperDriver::init(void){
-    pinMode2f(dir_pin, OUTPUT);
-    digitalWrite2f(dir_pin, HIGH);
+    pinMode(dir_pin, OUTPUT);
+    digitalWrite(dir_pin, HIGH);
 
-    pinMode2f(step_pin, OUTPUT);
-    digitalWrite2f(step_pin, LOW);
+    pinMode(step_pin, OUTPUT);
+    digitalWrite(step_pin, LOW);
 
     if IS_CONNECTED(enable_pin){
-        pinMode2f(enable_pin, OUTPUT);
-        digitalWrite2f(enable_pin, HIGH); // disable
+        pinMode(enable_pin, OUTPUT);
+        digitalWrite(enable_pin, HIGH); // disable
     }
 
     setMicrostep(1);
@@ -78,7 +77,7 @@ unsigned BasicStepperDriver::setMicrostep(unsigned microsteps){
  * DIR: forward HIGH, reverse LOW
  */
 void BasicStepperDriver::setDirection(int direction){
-    digitalWrite2f(dir_pin, (direction<0) ? LOW : HIGH);
+    digitalWrite(dir_pin, (direction<0) ? LOW : HIGH);
 }
 
 /*
@@ -104,10 +103,10 @@ void BasicStepperDriver::move(long steps){
     //wait for update tick instead of running here
     /*
     while (steps--){
-        digitalWrite2f(step_pin, HIGH);
+        digitalWrite(step_pin, HIGH);
         unsigned long next_edge = micros() + pulse_duration;
         microWaitUntil(next_edge);
-        digitalWrite2f(step_pin, LOW);
+        digitalWrite(step_pin, LOW);
         microWaitUntil(next_edge + pulse_duration);
     }
     */
@@ -135,13 +134,13 @@ void BasicStepperDriver::rotate(double deg){
  */
 void BasicStepperDriver::enable(void){
     if IS_CONNECTED(enable_pin){
-        digitalWrite2f(enable_pin, LOW);
+        digitalWrite(enable_pin, LOW);
     }
 }
 
 void BasicStepperDriver::disable(void){
     if IS_CONNECTED(enable_pin){
-        digitalWrite2f(enable_pin, HIGH);
+        digitalWrite(enable_pin, HIGH);
     }
 }
 
@@ -155,7 +154,7 @@ void BasicStepperDriver::tickMovement() {
         if (micros() - last_step_time > pulse_duration) {
             
             pulse_state = !pulse_state;
-            digitalWrite2f(step_pin, pulse_state);
+            digitalWrite(step_pin, pulse_state);
             
             //only decrement after a complete HIGH and LOW cycle
             if (pulse_state == LOW) {

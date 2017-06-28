@@ -4,7 +4,6 @@
  *
  * Copyright (C)2015 Laurentiu Badea
  *
- * Modified to use dio2 library for fast IO.  Normal arduino digitalWrite/etc are replaced with digitalWrite2/etc2.
  * Modified to step asynchronously.
  *
  * This file may be redistributed under the terms of the MIT license.
@@ -13,11 +12,9 @@
 #ifndef STEPPER_DRIVER_BASE_H
 #define STEPPER_DRIVER_BASE_H
 #include <Arduino.h>
-//#include "BasicStepperDriver.h"
-#include "arduino2.h"
 
 // used internally by the library to mark unconnected pins
-#define PIN_UNCONNECTED DP_INVALID
+#define PIN_UNCONNECTED -1
 #define IS_CONNECTED(pin) (pin != PIN_UNCONNECTED)
 
 /*
@@ -40,9 +37,9 @@ class BasicStepperDriver {
 protected:
     int motor_steps;
     int rpm = 60;
-    GPIO_pin_t dir_pin;
-    GPIO_pin_t step_pin;
-    GPIO_pin_t enable_pin = PIN_UNCONNECTED;
+    int dir_pin;
+    int step_pin;
+    int enable_pin = PIN_UNCONNECTED;
 
     // current microstep level, must be < getMaxMicrostep()
     // for 1:16 microsteps is 16
@@ -80,8 +77,8 @@ public:
     /*
      * Basic connection: DIR, STEP are connected.
      */
-    BasicStepperDriver(int steps, GPIO_pin_t dir_pin, GPIO_pin_t step_pin);
-    BasicStepperDriver(int steps, GPIO_pin_t dir_pin, GPIO_pin_t step_pin, GPIO_pin_t enable_pin);
+    BasicStepperDriver(int steps, int dir_pin, int step_pin);
+    BasicStepperDriver(int steps, int dir_pin, int step_pin, int enable_pin);
     /*
      * Set current microstep level, 1=full speed, 32=fine microstepping
      * Returns new level or previous level if value out of range

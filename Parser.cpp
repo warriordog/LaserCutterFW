@@ -120,10 +120,7 @@ namespace parser {
     
     void addLine(String* string) {
         if (string != nullptr) {
-        //Serial.println(F("Line added"));
             lineQueue.push(string);
-        } else {
-        //Serial.println(F("Line null"));
         }
     }
     

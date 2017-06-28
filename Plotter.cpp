@@ -132,25 +132,18 @@ namespace plotter {
     
         dist_um xDist = abs(xTarget - xLocation);
         
-        //Serial.println(xSpeed);
-        //Serial.println(ySpeed);
-        
         if (xDist != 0) {
-            //Serial.println(xDist);
             step_step steps = calcStepsForUm(xDist, X_STEPS_PER_MM);
             if (xTarget < xLocation) {
                 steps *= -1;
             }
             
             step_rpm rpm = calcRPM(X_STEPS_PER_MM, xSpeed);
-            //Serial.println(rpm);
             if (rpm > MAX_RPM) {
                 rpm = MAX_RPM;
             }
-            //Serial.println(rpm);
             xStepper->setRPM(rpm);
             
-            //Serial.println(steps);
             xStepper->moveByStep(steps);
             motorState = MOVING;
         }
@@ -166,10 +159,8 @@ namespace plotter {
             if (rpm > MAX_RPM) {
                 rpm = MAX_RPM;
             }
-            //Serial.println(rpm);
             yStepper->setRPM(rpm);
             
-            //Serial.println(steps);
             yStepper->moveByStep(steps);
             motorState = MOVING;
         }

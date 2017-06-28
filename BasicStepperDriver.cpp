@@ -153,15 +153,11 @@ unsigned BasicStepperDriver::getMaxMicrostep(){
 void BasicStepperDriver::tickMovement() {
     if (isMoving()) {
         if (micros() - last_step_time > pulse_duration) {
-            //digitalWrite2f(step_pin, HIGH);
-            //microWaitUntil(micros() + pulse_duration);
-            //digitalWrite2f(step_pin, LOW);
-            //last_step_time = micros();
             
             pulse_state = !pulse_state;
             digitalWrite2f(step_pin, pulse_state);
             
-            //only decrement after a HIGH and LOW cycle
+            //only decrement after a complete HIGH and LOW cycle
             if (pulse_state == LOW) {
                 steps_remaining--;
             }

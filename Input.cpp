@@ -16,6 +16,7 @@ namespace input {
     void setup() {
         Serial.begin(SERIAL_BAUD);
         Serial.println(F("LaserFW 0.0.1"));
+        Serial.println(F("READY"));
     }
 
 

@@ -10,12 +10,15 @@ namespace input {
     int nextBufferIdx = 0;
     BufferState bufferState = EMPTY;
     
+    // if true, commands are blocked until queue is empty
+    bool waitForEmpty = false;
+    
     // state of the immediate handler
     ImmHandlerState immState = NONE;
 
     void setup() {
         Serial.begin(SERIAL_BAUD);
-        Serial.println(F("LaserFW 0.1.0"));
+        Serial.println(F(FIRMWARE_VERSION));
     }
 
 
@@ -51,12 +54,18 @@ namespace input {
         return bufferState == READY;
     }
     
+    void sendOK() {
+        sendMessage(F("OK\n"));
+    }
+    
+    
     void poll() {
         if (Serial.available() > 0) {
             if (updateImmediateHandler(Serial.peek())) {
                 //ignore byte handled by immediate handler
                 Serial.read();
-            } else if (bufferState != READY) {
+            // don't read if we are emptying buffer or if the buffer is full
+            } else if (!waitForEmpty && bufferState != READY) {
                 int ch = Serial.read();
                 
                 // lock buffer when newline received (and don't add newline)
@@ -69,7 +78,7 @@ namespace input {
                     nextBufferIdx = 0;
                     bufferState = READY;
                     
-                    sendMessage(F("OK\n"));
+                    sendOK();
                 // don't read into full buffer, just ignore the byte and wait for newline
                 } else if (bufferState != OVERFLOW) {
                     buffer[nextBufferIdx] = ch;
@@ -110,6 +119,13 @@ namespace input {
         immWriteBack(ch3);
     }
     
+    void immWriteBack(char ch1, char ch2, char ch3, char ch4) {
+        immWriteBack(ch1);
+        immWriteBack(ch2);
+        immWriteBack(ch3);
+        immWriteBack(ch4);
+    }
+    
     bool updateImmediateHandler(int ch) {
         switch (immState) {
             case NONE:
@@ -124,6 +140,9 @@ namespace input {
             case M:
                 if (ch == '1') {
                     immState = M1;
+                    return true;
+                } else if (ch == '4') {
+                    immState = M4;
                     return true;
                 } else {
                     immWriteBack('M');
@@ -141,7 +160,7 @@ namespace input {
                 break;
             case M11:
                 if (ch == '2') {
-                    sendMessage(F("OK\n"));
+                    sendOK();
                     shutdownMachine();
                     immState = NONE;
                     return true;
@@ -152,12 +171,38 @@ namespace input {
                 break;
             case I:
                 if (ch == '0') {
-                    sendMessage(F("OK\n"));
+                    sendOK();
                     gcode::abortCurrentCommand();
                     immState = NONE;
                     return true;
                 } else {
                     immWriteBack('I');
+                    immState = NONE;
+                }
+                break;
+            case M4:
+                if (ch == '0') {
+                    immState = M40;
+                    return true;
+                } else {
+                    immWriteBack('M', '4');
+                    immState = NONE;
+                }
+                break;
+            case M40:
+                // M400 - flush buffer
+                if (ch == '0') {
+                    waitForEmpty = true;
+                    
+                    // write back command and send
+                    immWriteBack('M', '4', '0', '0');
+                    nextBufferIdx = 0;
+                    bufferState = READY;
+                    
+                    immState = NONE;
+                    return true;
+                } else {
+                    immWriteBack('M', '4', '0');
                     immState = NONE;
                 }
                 break;
@@ -167,6 +212,11 @@ namespace input {
                 break;
         }
         return false;
+    }
+    
+    void m114Finished() {
+        sendOK();
+        waitForEmpty = false;
     }
     
     void printDebug() {

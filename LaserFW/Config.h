@@ -5,6 +5,8 @@
   Configuration values
 */
 
+#define FIRMWARE_VERSION    "LaserFW 0.3.3"
+
 // min and max coordinates for the X axis (mm)
 #define X_AXIS_MIN          0
 #define X_AXIS_MAX          900     //just under 3 feet

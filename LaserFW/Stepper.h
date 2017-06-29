@@ -14,7 +14,7 @@ namespace stepper {
             BasicStepperDriver driver;
             step_step lastCommandSteps;
             
-            bool isEnabled = true;
+            bool isEnabled = false;
         public:
             Stepper(int stepPin, int directionPin, int enablePin);
         

@@ -7,6 +7,7 @@
 #include "Lights.h"
 #include "Scheduler.h"
 #include "Safety.h"
+#include "Config.h"
 
 namespace gcode {
     // 0 is idle, 1 is code-default, everything else is code-specific
@@ -181,6 +182,17 @@ namespace gcode {
                             plotter::getYStepper()->disable();
                             currState = 0;
                             break;
+                        // get laser power
+                        case 105:
+                            input::sendMessage(F("M105 "));
+                            if (laser::isLaserOn()) {
+                                input::sendInt(laser::getLaserLevel());
+                            } else {
+                                input::sendInt(-1);
+                            }
+                            input::sendChar('\n');
+                            currState = 0;
+                            break;
                         //M114 get position
                         case 114: {
                             input::sendMessage(F("M114 X:"));
@@ -193,7 +205,15 @@ namespace gcode {
                             input::sendInt(y.mm);
                             input::sendChar('.');
                             input::sendInt(y.dec);
-                            input::sendMessage(F("\n"));
+                            input::sendChar('\n');
+                            currState = 0;
+                            break;
+                        }
+                        // get firmware version
+                        case 115: {
+                            input::sendMessage(F("M115 "));
+                            input::sendMessage(F(FIRMWARE_VERSION));
+                            input::sendChar('\n');
                             currState = 0;
                             break;
                         }
@@ -206,6 +226,14 @@ namespace gcode {
                             safety::printDebug();
                             //scheduler::printDebug();
                             input::sendMessage(F("EOL\n"));
+                            currState = 0;
+                            break;
+                        //M400 flush buffer
+                        case 400:
+                            // by the time we get here, the buffer is empty.
+                            // send OK to finally acknowledge the command and allow sending
+                            input::m114Finished();
+                            
                             currState = 0;
                             break;
                         // invalid

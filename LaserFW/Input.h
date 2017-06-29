@@ -22,7 +22,9 @@ namespace input {
         M,
         M1,
         M11,
-        I
+        I,
+        M4,
+        M40
     };
 
     void setup();
@@ -34,12 +36,15 @@ namespace input {
     void sendULong(unsigned long val);
     void sendBool(bool val);
     void sendChar(char chr);
+    void sendOK();
 
     bool lineReady();
     void poll();
     String* takeLine();
     
     bool updateImmediateHandler(int chr);
+    
+    void m114Finished();
     
     void printDebug();
 }

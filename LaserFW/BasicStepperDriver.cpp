@@ -42,7 +42,7 @@ void BasicStepperDriver::init(void){
     setMicrostep(1);
     setRPM(60); // 60 rpm is a reasonable default
 
-    enable();
+    //enable();
 }
 
 

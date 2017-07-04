@@ -5,7 +5,7 @@
   Configuration values
 */
 
-#define FIRMWARE_VERSION    "LaserFW 0.3.3"
+#define FIRMWARE_VERSION    "LaserFW 0.4.3"
 
 // min and max coordinates for the X axis (mm)
 #define X_AXIS_MIN          0
@@ -55,5 +55,8 @@
 
 // Time for life LED to complete one pulse-fade cycle (ms)
 #define LED_LIFE_INTERVAL   2000L   // 2 seconds
+
+// Default time to disable laser safety in M888
+#define DEFAULT_M888_TIME   10      // 10 seconds
 
 #endif //CONFIG_H

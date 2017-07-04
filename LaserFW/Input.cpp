@@ -3,6 +3,8 @@
 #include "Config.h"
 #include "LaserFW.h"
 #include "GCode.h"
+#include "Plotter.h"
+#include "Laser.h"
 
 namespace input {
     // 1 extra space for null byte
@@ -18,9 +20,13 @@ namespace input {
 
     void setup() {
         Serial.begin(SERIAL_BAUD);
-        Serial.println(F(FIRMWARE_VERSION));
+        sendLine(F(FIRMWARE_VERSION));
     }
 
+    void sendLine(const __FlashStringHelper* message) {
+        sendMessage(message);
+        sendNewline();
+    }
 
     void sendMessage(const __FlashStringHelper* message) {
         Serial.print(message);
@@ -56,6 +62,10 @@ namespace input {
     
     void sendOK() {
         sendMessage(F("OK\n"));
+    }
+    
+    void sendNewline() {
+        sendChar('\n');
     }
     
     
@@ -160,23 +170,68 @@ namespace input {
                 break;
             case M11:
                 if (ch == '2') {
-                    sendOK();
-                    shutdownMachine();
-                    immState = NONE;
+                    immState = M112;
                     return true;
                 } else {
                     immWriteBack('M', '1', '1');
                     immState = NONE;
                 }
                 break;
+            // M112 emergency stop
+            case M112:
+                if (ch == '\n') {
+                    sendOK();
+                    shutdownMachine();
+                    immState = NONE;
+                    return true;
+                } else {
+                    immWriteBack('M', '1', '1', '2');
+                    immState = NONE;
+                }
+                break;
             case I:
                 if (ch == '0') {
+                    immState = I0;
+                    return true;
+                } else if (ch == '1') {
+                    immState = I1;
+                    return true;
+                } else {
+                    immWriteBack('I');
+                    immState = NONE;
+                }
+                break;
+            // I0 abort previous command
+            case I0:
+                if (ch == '\n') {
                     sendOK();
                     gcode::abortCurrentCommand();
                     immState = NONE;
                     return true;
                 } else {
-                    immWriteBack('I');
+                    immWriteBack('I', '0');
+                    immState = NONE;
+                }
+                break;
+            // I1 immediate full status update
+            case I1:
+                if (ch == '\n') {
+                    sendOK();
+                    Serial.print(F("I1 X"));
+                    Serial.print(plotter::getXLocation());
+                    Serial.print(F(" Y"));
+                    Serial.print(plotter::getYLocation());
+                    Serial.print(F(" F"));
+                    Serial.print(plotter::getXSpeed());
+                    Serial.print(F(" P"));
+                    Serial.print(laser::isLaserOn());
+                    Serial.print(F(" S"));
+                    Serial.print(laser::getLaserLevel());
+                    sendNewline();
+                    immState = NONE;
+                    return true;
+                } else {
+                    immWriteBack('I', '1');
                     immState = NONE;
                 }
                 break;
@@ -184,25 +239,33 @@ namespace input {
                 if (ch == '0') {
                     immState = M40;
                     return true;
-                } else {
+                }else {
                     immWriteBack('M', '4');
                     immState = NONE;
                 }
                 break;
             case M40:
-                // M400 - flush buffer
                 if (ch == '0') {
+                    immState = M400;
+                    return true;
+                } else {
+                    immWriteBack('M', '4', '0');
+                    immState = NONE;
+                }
+                break;
+            // M400 - flush buffer
+            case M400:
+                if (ch == '\n') {
                     waitForEmpty = true;
                     
                     // write back command and send
                     immWriteBack('M', '4', '0', '0');
                     nextBufferIdx = 0;
                     bufferState = READY;
-                    
                     immState = NONE;
                     return true;
                 } else {
-                    immWriteBack('M', '4', '0');
+                    immWriteBack('M', '4', '0', '0');
                     immState = NONE;
                 }
                 break;
@@ -234,7 +297,8 @@ namespace input {
         Serial.print(F("'\n"));
         
         Serial.print(F("input::nextBufferIdx="));
-        Serial.println(nextBufferIdx);
+        Serial.print(nextBufferIdx);
+        sendNewline();
         
         Serial.print(F("input::bufferState="));
         switch(bufferState) {
@@ -242,7 +306,10 @@ namespace input {
             case BUILDING: Serial.print(F("BUILDING\n")); break;
             case READY: Serial.print(F("READY\n")); break;
             case OVERFLOW: Serial.print(F("OVERFLOW\n")); break;
-            default: Serial.println(bufferState);
+            default: {
+                Serial.print(bufferState);
+                sendNewline();
+            }
         }
     }
 }

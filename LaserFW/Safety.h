@@ -9,6 +9,9 @@ namespace safety {
     
     time_ms getAvgTickDuration();
     
+    void disableLaserSafety(time_sec time);
+    void enableLaserSafety();
+    
     void printDebug();
 }
 

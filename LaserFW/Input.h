@@ -22,13 +22,18 @@ namespace input {
         M,
         M1,
         M11,
+        M112,
         I,
+        I0,
+        I1,
         M4,
-        M40
+        M40,
+        M400
     };
 
     void setup();
     
+    void sendLine(const __FlashStringHelper* message);
     void sendMessage(const __FlashStringHelper* message);
     void sendString(char* str);
     void sendInt(int val);
@@ -37,6 +42,7 @@ namespace input {
     void sendBool(bool val);
     void sendChar(char chr);
     void sendOK();
+    void sendNewline();
 
     bool lineReady();
     void poll();

@@ -64,17 +64,21 @@ namespace plotter {
     
     void setTarget(dist_um x, dist_um y) {setTargetX(x); setTargetY(y);}
     
-    void setXSpeed(mm_per_sec vel) {
+    void setXSpeed(mm_per_min vel) {
         if (vel > MAX_X_FEED) {
             vel = MAX_X_FEED;
         }
         xSpeed = vel;
     }
-    void setYSpeed(mm_per_sec vel) {
+    void setYSpeed(mm_per_min vel) {
         if (vel > MAX_Y_FEED) {
             vel = MAX_Y_FEED;
         }
         ySpeed = vel;
+    }
+    
+    mm_per_min getXSpeed() {
+        return xSpeed;
     }
     
     bool isMoving() {return motorState != IDLE;}

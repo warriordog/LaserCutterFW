@@ -236,6 +236,26 @@ namespace gcode {
                             
                             currState = 0;
                             break;
+                        //M888 disable laser timeout
+                        case 888: {
+                            Field* fS = findField('S');
+                            
+                            time_sec time = DEFAULT_M888_TIME;
+                            if (fS != nullptr) {
+                                time = fS->iNum;
+                            }
+                            
+                            safety::disableLaserSafety(time);
+                            
+                            currState = 0;
+                            break;
+                        }
+                        //M889 enable laser timeout
+                        case 889:
+                            safety::enableLaserSafety();
+                            
+                            currState = 0;
+                            break;
                         // invalid
                         default:
                             currState = 0;

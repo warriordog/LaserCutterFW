@@ -19,9 +19,16 @@ namespace safety {
     time_us totTickDuration = 0;
     unsigned long numTicks = 0;
     
+    // if laser safety is disabled
+    bool laserSafetyDisabled = false;
+    // time when laser safety was disabled
+    time_ms laserSafetyDisabledStart = 0;
+    time_ms laserSafetyDisabledTime = 0;
+    
     // Forward declarations
     void checkLaserDwell();
     void updateTickTime();
+    void checkLaserDisabledTimeout();
     
     void setup() {
         wdt_enable(WDTO_4S);
@@ -29,6 +36,7 @@ namespace safety {
     
     void tick() {
         updateTickTime();
+        checkLaserDisabledTimeout();
         checkLaserDwell();
         wdt_reset();
     }
@@ -51,7 +59,7 @@ namespace safety {
             // if laser is on, check timer
             if (laser::isLaserOn()) {
                 // laser time limit reached
-                if (millis() - lastMoveTime > LASER_DWELL_LIMIT) {
+                if (!laserSafetyDisabled && millis() - lastMoveTime > LASER_DWELL_LIMIT) {
                     laserSafetyEngaged = true;
                     laserLevel = laser::getLaserLevel(); //store power level since powerOff resets it
                     laser::laserPowerOff();
@@ -95,6 +103,26 @@ namespace safety {
         return totTickDuration / numTicks;
     }
     
+    void disableLaserSafety(time_sec time) {
+        laserSafetyDisabled = true;
+        laserSafetyDisabledStart = millis() + (time * 1000l);
+        laserSafetyDisabledTime = time * 1000l;
+    }
+    
+    void enableLaserSafety() {
+        laserSafetyDisabled = false;
+        laserSafetyDisabledStart = 0;
+        laserSafetyDisabledTime = 0;
+    }
+    
+    void checkLaserDisabledTimeout() {
+        if (laserSafetyDisabled) {
+            if (millis() - laserSafetyDisabledStart > laserSafetyDisabledTime) {
+                enableLaserSafety();
+            }
+        }
+    }
+    
     void printDebug() {
         input::sendMessage(F("safety::laserSafetyEngaged="));
         input::sendBool(laserSafetyEngaged);
@@ -114,6 +142,12 @@ namespace safety {
         input::sendULong(numTicks);
         input::sendMessage(F("\nsafety::getAvgTickDuration()="));
         input::sendULong(getAvgTickDuration());
+        input::sendMessage(F("\nsafety::laserSafetyDisabled="));
+        input::sendBool(laserSafetyDisabled);
+        input::sendMessage(F("\nsafety::laserSafetyDisableStart="));
+        input::sendULong(laserSafetyDisabledStart);
+        input::sendMessage(F("\nsafety::laserSafetyDisableTime="));
+        input::sendULong(laserSafetyDisabledTime);
         input::sendChar('\n');
     }
 }

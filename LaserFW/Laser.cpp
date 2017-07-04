@@ -33,7 +33,7 @@ namespace laser {
         if (level > 255) {
             level = 255;
         }
-        analogWrite(PIN_LASER_TTL, 0);
+        analogWrite(PIN_LASER_TTL, level);
         laserLevel = level;
     }
     

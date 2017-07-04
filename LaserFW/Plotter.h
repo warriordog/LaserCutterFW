@@ -15,6 +15,7 @@ namespace plotter {
     
     void setXSpeed(mm_per_min vel);
     void setYSpeed(mm_per_min vel);
+    mm_per_min getXSpeed();
     
     bool isMoving();
     

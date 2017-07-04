@@ -105,7 +105,7 @@ namespace safety {
     
     void disableLaserSafety(time_sec time) {
         laserSafetyDisabled = true;
-        laserSafetyDisabledStart = millis() + (time * 1000l);
+        laserSafetyDisabledStart = millis();
         laserSafetyDisabledTime = time * 1000l;
     }
     

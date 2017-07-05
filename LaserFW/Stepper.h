@@ -33,7 +33,7 @@ namespace stepper {
             
             void setRPM(int rpm);
             
-            void tickDriver();
+            bool tickDriver();
             bool isMoving();
             step_step getCurrentProgress();
             

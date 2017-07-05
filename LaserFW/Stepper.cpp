@@ -44,8 +44,8 @@ namespace stepper {
         driver.setRPM(rpm);
     }
     
-    void Stepper::tickDriver() {
-        driver.tickMovement();
+    bool Stepper::tickDriver() {
+        return driver.tickMovement();
     }
     
     bool Stepper::isMoving() {

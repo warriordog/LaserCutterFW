@@ -149,7 +149,9 @@ unsigned BasicStepperDriver::getMaxMicrostep(){
 }
 
 // progresses the current movement
-void BasicStepperDriver::tickMovement() {
+bool BasicStepperDriver::tickMovement() {
+    bool moved = false;
+    
     if (isMoving()) {
         if (micros() - last_step_time > pulse_duration) {
             
@@ -159,10 +161,13 @@ void BasicStepperDriver::tickMovement() {
             //only decrement after a complete HIGH and LOW cycle
             if (pulse_state == LOW) {
                 steps_remaining--;
+                moved = true;
             }
             last_step_time = micros();
         }
     }
+    
+    return moved;
 }
 
 
@@ -170,6 +175,6 @@ bool BasicStepperDriver::isMoving() {
     return steps_remaining > 0;
 }
 
-long BasicStepperDriver::getStepsRemaining() {
+step_step BasicStepperDriver::getStepsRemaining() {
     return steps_remaining;
 }

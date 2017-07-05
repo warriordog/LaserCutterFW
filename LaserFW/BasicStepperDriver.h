@@ -5,6 +5,7 @@
  * Copyright (C)2015 Laurentiu Badea
  *
  * Modified to step asynchronously.
+ * Modified to use unit types.
  *
  * This file may be redistributed under the terms of the MIT license.
  * A copy of this license has been included with this distribution in the file LICENSE.
@@ -12,6 +13,7 @@
 #ifndef STEPPER_DRIVER_BASE_H
 #define STEPPER_DRIVER_BASE_H
 #include <Arduino.h>
+#include "Units.h"
 
 // used internally by the library to mark unconnected pins
 #define PIN_UNCONNECTED -1
@@ -62,7 +64,7 @@ protected:
     virtual unsigned getMaxMicrostep();
 
     //steps remaining in this movement
-    long steps_remaining = 0;
+    step_step steps_remaining = 0;
     //time of last movement
     unsigned long last_step_time;
     //duration of this movement
@@ -110,8 +112,8 @@ public:
     void enable(void);
     void disable(void);
     
-    void tickMovement();
+    bool tickMovement();
     bool isMoving();
-    long getStepsRemaining();
+    step_step getStepsRemaining();
 };
 #endif // STEPPER_DRIVER_BASE_H

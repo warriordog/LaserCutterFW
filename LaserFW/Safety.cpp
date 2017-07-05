@@ -51,7 +51,9 @@ namespace safety {
             // laser has moved, turn back on
             if (lastMoveX != plotter::getXLocation() || lastMoveY != plotter::getYLocation()) {
                 laserSafetyEngaged = false;
-                laser::laserPowerOn();
+                if (laserLevel > 0) {
+                    laser::laserPowerOn();
+                }
                 laser::setLaserLevel(laserLevel);
             }
         // if safety is off then do normal checks

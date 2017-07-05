@@ -17,7 +17,7 @@
 
 // Laser
 #define PIN_LASER_POWER     8//DP8
-#define PIN_LASER_TTL       4// should be far right servo channel, don't use dio2 for PWM
+#define PIN_LASER_TTL       5// should be 2nd to far right servo channel, don't use dio2 for PWM
 
 
 // LEDs

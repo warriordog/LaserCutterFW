@@ -7,10 +7,13 @@
 #include "Safety.h"
 #include "Input.h"
 #include "Lights.h"
+#include <Arduino.h>
+#include "Config.h"
 
 bool machineRunning = true;
 
 void laserSetup() {
+    delay(BOOT_DELAY);
     lights::setup();
     input::setup();
     plotter::setup();

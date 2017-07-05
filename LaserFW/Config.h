@@ -5,7 +5,7 @@
   Configuration values
 */
 
-#define FIRMWARE_VERSION    "LaserFW 0.6.3"
+#define FIRMWARE_VERSION    "LaserFW 0.6.4"
 
 // min and max coordinates for the X axis (mm)
 #define X_AXIS_MIN          0
@@ -58,5 +58,8 @@
 
 // Default time to disable laser safety in M888
 #define DEFAULT_M888_TIME   10      // 10 seconds
+
+// Time to wait at boot
+#define BOOT_DELAY          500    // 1 second
 
 #endif //CONFIG_H

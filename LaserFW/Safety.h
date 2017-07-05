@@ -12,6 +12,8 @@ namespace safety {
     void disableLaserSafety(time_sec time);
     void enableLaserSafety();
     
+    bool isLaserSafetyEngaged();
+    
     void printDebug();
 }
 

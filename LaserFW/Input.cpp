@@ -5,6 +5,7 @@
 #include "GCode.h"
 #include "Plotter.h"
 #include "Laser.h"
+#include "Safety.h"
 
 namespace input {
     // 1 extra space for null byte
@@ -227,6 +228,8 @@ namespace input {
                     Serial.print(laser::isLaserOn());
                     Serial.print(F(" S"));
                     Serial.print(laser::getLaserLevel());
+                    Serial.print(F(" T"));
+                    Serial.print(safety::isLaserSafetyEngaged());
                     sendNewline();
                     immState = NONE;
                     return true;

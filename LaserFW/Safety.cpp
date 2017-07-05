@@ -123,6 +123,10 @@ namespace safety {
         }
     }
     
+    bool isLaserSafetyEngaged() {
+        return laserSafetyEngaged;
+    }
+    
     void printDebug() {
         input::sendMessage(F("safety::laserSafetyEngaged="));
         input::sendBool(laserSafetyEngaged);
